@@ -2,16 +2,28 @@
 
 <img src="app.ico" width="96" alt="Иконка KitagawaUtilits">
 
-# KitagawaUtilits v6.0
+# KitagawaUtilits v6.1
 
 **Простой и безопасный помощник для Android на Windows**
 
-[![Версия](https://img.shields.io/badge/%D0%B2%D0%B5%D1%80%D1%81%D0%B8%D1%8F-6.0-C94A4A?style=for-the-badge)](../../releases/latest)
+[![Версия](https://img.shields.io/badge/%D0%B2%D0%B5%D1%80%D1%81%D0%B8%D1%8F-6.1-C94A4A?style=for-the-badge)](../../releases/latest)
 [![Windows](https://img.shields.io/badge/Windows-10%20%7C%2011-0078D6?style=for-the-badge&logo=windows&logoColor=white)](#-системные-требования)
 [![Python](https://img.shields.io/badge/Python-3.10%2B-3776AB?style=for-the-badge&logo=python&logoColor=white)](#-запуск-из-исходников)
 [![Android](https://img.shields.io/badge/Android-7.0%2B-3DDC84?style=for-the-badge&logo=android&logoColor=white)](#-подготовка-телефона)
 
 [Возможности](#-возможности) • [Быстрый старт](#-быстрый-старт) • [Подготовка телефона](#-подготовка-телефона) • [Сборка .exe](#-сборка-exe) • [Решение проблем](#-решение-проблем)
+
+## 📥 СКАЧАТЬ ПРОГРАММУ / DOWNLOAD FOR WINDOWS
+
+| 🇷🇺 Русский | 🇬🇧 English |
+|---|---|
+| **[⬇️ Скачать KitagawaUtilits.zip (Рекомендуется — программа + драйверы + инструкция)](https://github.com/Be3un4uk586/KitagawaUtilits/releases/latest/download/KitagawaUtilits.zip)** | **[⬇️ Download KitagawaUtilits.zip (Recommended — app + drivers + guide)](https://github.com/Be3un4uk586/KitagawaUtilits/releases/latest/download/KitagawaUtilits.zip)** |
+| [Скачать только KitagawaUtilits.exe](https://github.com/Be3un4uk586/KitagawaUtilits/releases/latest/download/KitagawaUtilits.exe) | [Download KitagawaUtilits.exe only](https://github.com/Be3un4uk586/KitagawaUtilits/releases/latest/download/KitagawaUtilits.exe) |
+
+> [!WARNING]
+> **Не нажимайте зелёную кнопку Code сверху — это исходный код для программистов. Скачивайте готовый архив по ссылке выше!**
+>
+> **Do not click the green Code button above — that is source code for developers. Download the ready-to-use archive using the link above!**
 
 </div>
 
@@ -44,7 +56,7 @@
 | **Автоопределение** | Программа сама распознаёт подключённый телефон и предлагает подходящие файлы |
 | **Загрузка** | Скачивание прошивок с прогресс-баром в папку `downloads` рядом с программой |
 | **Установка** | Через кабель (ADB sideload), через режим загрузчика (fastboot) или обычным обновлением |
-| **Обновление базы** | Кнопка «Обновить базу» и локальный кэш каталога в `%LOCALAPPDATA%\KitagawaUtilits` |
+| **Живое обновление базы** | Кнопка «Обновить базу» скачивает свежий `firmwares.json` прямо из GitHub-репозитория — без пересборки `.exe`; кэш хранится в `%LOCALAPPDATA%\KitagawaUtilits` |
 
 ### 🧹 Безопасная очистка от рекламы (ADB Debloater без Root)
 
@@ -77,6 +89,14 @@
 - **Установка `.apk`** с ПК на телефон в один клик.
 - **Проверка прошивки по MD5 / SHA256** — сравнение хеша файла с хешем с сайта производителя,
   чтобы не установить битый или подменённый файл.
+
+### 🌐 Пять языков интерфейса
+
+- **Русский**, **English**, **Українська**, **Español** и **中文**.
+- Компактный выбор языка `🌐` в нижней части левой боковой панели.
+- Весь интерфейс переводится **сразу, без перезапуска программы**: вкладки, заголовки,
+  кнопки, статусы подключения, карточки диагностики и форма обратной связи.
+- Выбор языка сохраняется в `%LOCALAPPDATA%\KitagawaUtilits\settings.json`.
 
 ### 🎨 Интерфейс и удобство
 
@@ -189,11 +209,11 @@ python main.py
 
 ```bash
 pip install -r requirements.txt
-pyinstaller --noconfirm KitagawaUtilits.spec
+pyinstaller --noconfirm --clean --onefile --noconsole --icon=app.ico --name KitagawaUtilits --add-data "app.ico;." --add-data "locales.json;." --add-data "tools;tools" --add-data "firmwares.json;." --collect-all customtkinter main.py
 ```
 
-Готовый файл появится в `dist\KitagawaUtilits.exe`. Рядом с ним нужно положить папку `tools`
-с `adb.exe` и `fastboot.exe`.
+Готовый файл появится в `dist\KitagawaUtilits.exe`. В режиме `--onefile` внутрь `.exe`
+уже упакованы `locales.json`, `firmwares.json`, `app.ico` и папка `tools` с `adb`/`fastboot`.
 
 ---
 
@@ -202,6 +222,7 @@ pyinstaller --noconfirm KitagawaUtilits.spec
 ```text
 KitagawaUtilits/
 ├─ main.py                 # интерфейс и вся логика приложения
+├─ locales.json            # переводы интерфейса (ru, en, uk, es, zh)
 ├─ firmwares.json          # каталог прошивок (600+ устройств)
 ├─ app.ico                 # фирменная иконка приложения
 ├─ Инструкция.txt          # пошаговая инструкция для новичков
@@ -272,6 +293,6 @@ MD5/SHA256. Не устанавливайте файл с несовпадающ
 
 Сделано с ❤️ для тех, кто хочет, чтобы телефон работал быстрее и чище.
 
-**[⬆ Наверх](#kitagawaitilits-v60)**
+**[⬆ Наверх](#kitagawaitilits-v61)**
 
 </div>

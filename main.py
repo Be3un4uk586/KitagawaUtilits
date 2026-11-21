@@ -1,13 +1,19 @@
 """
-KitagawaUtilits v6.0.
+KitagawaUtilits v6.1.
 
 Простой и безопасный помощник для Android на Windows.
 
-Что нового в версии 6.0:
+Что нового в версии 6.1:
+  * 5 языков интерфейса: русский, English, Українська, Español, 中文;
+  * выбор языка в боковой панели с мгновенным переводом без перезапуска;
+  * выбор языка сохраняется в %LOCALAPPDATA%\\KitagawaUtilits\\settings.json;
+  * живое обновление каталога прошивок прямо из GitHub-репозитория;
+  * перевод вкладок, кнопок, статусов, карточек диагностики и формы поддержки.
+
+Возможности версии 6.0:
   * вкладка «Здоровье и железо»: батарея, циклы, железо и безопасность через ADB;
   * трансляция экрана телефона на ПК через scrcpy с управлением мышкой;
   * обновление каталога прошивок из интернета и кэш в LOCALAPPDATA;
-  * исправлена иконка .exe в Проводнике Windows — все размеры от 16 до 256 px;
   * в каталог добавлены Android-планшеты 2020–2026 с пометкой [Планшет];
   * анимированная заставка, вкладка «Поддержка и идеи» и форма Formspree;
   * плавная прокрутка на всех вкладках — нижние кнопки всегда доступны;
@@ -48,9 +54,9 @@ except Exception:  # noqa: BLE001
 # Константы
 # ---------------------------------------------------------------------------
 APP_NAME = "KitagawaUtilits"
-APP_VERSION = "6.0.0"
+APP_VERSION = "6.1.0"
 APP_SUBTITLE = "Простой и безопасный помощник для Android"
-APP_TITLE = "KitagawaUtilits v6.0"
+APP_TITLE = "KitagawaUtilits v6.1"
 
 # Скрывает консольное окно Windows при запуске дочерних процессов.
 CREATE_NO_WINDOW = 0x08000000
@@ -322,12 +328,157 @@ LOCAL_DATA_DIR = os.path.join(
 FIRMWARES_CACHE_FILE = os.path.join(LOCAL_DATA_DIR, "firmwares_cache.json")
 SCRCPY_DIR = os.path.join(LOCAL_DATA_DIR, "scrcpy")
 
-# Ссылка на облачный JSON-каталог прошивок. Пока пусто: используется
-# встроенный firmwares.json, а кнопка «Обновить базу» показывает уведомление.
-REMOTE_CATALOG_URL = ""
+# Живой каталог прошивок: кнопка «Обновить базу» скачивает свежий JSON
+# прямо из GitHub-репозитория, без пересборки .exe.
+REMOTE_CATALOG_URL = (
+    "https://raw.githubusercontent.com/Be3un4uk586/KitagawaUtilits/main/firmwares.json"
+)
 
 # GitHub API для загрузки последнего релиза scrcpy-win64.
 SCRCPY_RELEASE_API = "https://api.github.com/repos/Genymobile/scrcpy/releases/latest"
+
+# ---------------------------------------------------------------------------
+# Локализация (5 языков)
+# ---------------------------------------------------------------------------
+LANGUAGES = [
+    ("ru", "🌐 Русский"),
+    ("en", "🌐 English"),
+    ("uk", "🌐 Українська"),
+    ("es", "🌐 Español"),
+    ("zh", "🌐 中文"),
+]
+LANGUAGE_LABELS = {code: label for code, label in LANGUAGES}
+LABEL_TO_CODE = {label: code for code, label in LANGUAGES}
+LANG = "ru"
+LOCALES: dict[str, dict] = {}
+SETTINGS_FILE = os.path.join(LOCAL_DATA_DIR, "settings.json")
+
+
+def load_locales() -> None:
+    """Загружает переводы из locales.json (работает и внутри собранного .exe)."""
+    global LOCALES
+    try:
+        with open(resource_path("locales.json"), "r", encoding="utf-8") as handle:
+            data = json.load(handle)
+        LOCALES = data if isinstance(data, dict) else {}
+    except Exception:  # noqa: BLE001
+        LOCALES = {}
+
+
+def load_settings() -> None:
+    """Читает сохранённый язык из settings.json."""
+    global LANG
+    try:
+        with open(SETTINGS_FILE, "r", encoding="utf-8") as handle:
+            data = json.load(handle)
+        code = data.get("language") if isinstance(data, dict) else None
+        if code in LANGUAGE_LABELS:
+            LANG = code
+    except Exception:  # noqa: BLE001
+        LANG = "ru"
+
+
+def save_settings() -> None:
+    """Сохраняет выбранный язык в %LOCALAPPDATA%\\KitagawaUtilits\\settings.json."""
+    try:
+        os.makedirs(LOCAL_DATA_DIR, exist_ok=True)
+        with open(SETTINGS_FILE, "w", encoding="utf-8") as handle:
+            json.dump({"language": LANG}, handle, ensure_ascii=False, indent=2)
+    except Exception:  # noqa: BLE001
+        pass
+
+
+def t(key: str, **kwargs) -> str:
+    """Перевод по ключу с откатом на русский и на сам ключ."""
+    value = None
+    for code in (LANG, "ru"):
+        candidate = (LOCALES.get(code) or {}).get(key)
+        if isinstance(candidate, str):
+            value = candidate
+            break
+    if value is None:
+        return key
+    if kwargs:
+        try:
+            return value.format(**kwargs)
+        except (KeyError, IndexError, ValueError):
+            return value
+    return value
+
+
+def tr(text):
+    """Переводит точную строку интерфейса, если для неё есть перевод."""
+    if not isinstance(text, str) or LANG == "ru":
+        return text
+    return (LOCALES.get(LANG) or {}).get(text, text)
+
+
+def support_topics() -> list[str]:
+    """Список тем формы поддержки на текущем языке."""
+    values = (LOCALES.get(LANG) or {}).get("support_topics")
+    if not isinstance(values, list):
+        values = (LOCALES.get("ru") or {}).get("support_topics")
+    if not isinstance(values, list):
+        values = SUPPORT_TOPICS
+    return [str(item) for item in values]
+
+
+def set_language(code: str) -> None:
+    """Меняет язык и сразу сохраняет выбор."""
+    global LANG
+    if code in LANGUAGE_LABELS:
+        LANG = code
+        save_settings()
+
+
+def _patch_widget_translation(cls, attr: str) -> None:
+    original = cls.__init__
+
+    def wrapper(self, *args, **kwargs):
+        value = kwargs.get(attr)
+        if isinstance(value, str):
+            kwargs[attr] = tr(value)
+        original(self, *args, **kwargs)
+
+    cls.__init__ = wrapper
+
+
+def _patch_messageboxes() -> None:
+    for name in ("showinfo", "showwarning", "showerror", "askyesno", "askokcancel"):
+        original = getattr(messagebox, name)
+
+        def wrapper(*args, _original=original, **kwargs):
+            args = tuple(tr(item) if isinstance(item, str) else item for item in args)
+            return _original(*args, **kwargs)
+
+        setattr(messagebox, name, wrapper)
+
+
+def _patch_file_dialogs() -> None:
+    for name in ("askopenfilename", "asksaveasfilename"):
+        original = getattr(filedialog, name)
+
+        def wrapper(*args, _original=original, **kwargs):
+            if isinstance(kwargs.get("title"), str):
+                kwargs["title"] = tr(kwargs["title"])
+            return _original(*args, **kwargs)
+
+        setattr(filedialog, name, wrapper)
+
+
+load_locales()
+load_settings()
+
+for _widget_cls, _widget_attr in (
+    (ctk.CTkLabel, "text"),
+    (ctk.CTkButton, "text"),
+    (ctk.CTkSwitch, "text"),
+    (ctk.CTkCheckBox, "text"),
+    (ctk.CTkEntry, "placeholder_text"),
+):
+    _patch_widget_translation(_widget_cls, _widget_attr)
+_patch_messageboxes()
+_patch_file_dialogs()
 
 
 def popen_flags() -> int:
@@ -385,7 +536,7 @@ class SplashScreen:
 
         ctk.CTkLabel(
             body,
-            text="Подготовка инструментов и каталога прошивок...",
+            text=t("splash_subtitle"),
             font=ui_font(size=11),
             text_color=COLOR_MUTED,
         ).grid(row=2, column=0, pady=(4, 16))
@@ -537,6 +688,7 @@ class KitagawaUtilitsApp(ctk.CTk):
         self._action_widgets: list[ctk.CTkBaseClass] = []
         self.pages: dict[str, ctk.CTkFrame] = {}
         self.nav_buttons: dict[str, ctk.CTkButton] = {}
+        self._current_page = "catalog"
 
         self._build_ui()
         self._configure_log_tags()
@@ -694,14 +846,14 @@ class KitagawaUtilitsApp(ctk.CTk):
 
         ctk.CTkLabel(
             sidebar,
-            text="Версия 6.0",
+            text=t("version_label"),
             font=ui_font(size=12, weight="bold"),
             text_color=COLOR_ACCENT,
         ).pack(anchor="w", padx=20, pady=(2, 2))
 
         ctk.CTkLabel(
             sidebar,
-            text=APP_SUBTITLE,
+            text=t("app_subtitle"),
             font=ui_font(size=11),
             text_color=COLOR_MUTED,
             wraplength=224,
@@ -710,7 +862,7 @@ class KitagawaUtilitsApp(ctk.CTk):
 
         self.connection_badge = ctk.CTkLabel(
             sidebar,
-            text="●  Ожидание USB",
+            text=t("conn_waiting"),
             fg_color=COLOR_CARD_HOVER,
             text_color=COLOR_MUTED,
             corner_radius=10,
@@ -721,14 +873,14 @@ class KitagawaUtilitsApp(ctk.CTk):
         self.connection_badge.pack(fill="x", padx=14, pady=(0, 12))
 
         nav_items = [
-            ("catalog", "📦  Прошивки"),
-            ("manual", "⚡  Установка прошивки"),
-            ("cleanup", "🧹  Очистка от рекламы"),
-            ("tools", "🛠  Помощник и APK"),
-            ("manage", "🔄  Управление телефоном"),
-            ("hardware", "📊  Здоровье и железо"),
-            ("guide", "📖  Инструкция"),
-            ("support", "💬  Поддержка и идеи"),
+            ("catalog", t("nav_catalog")),
+            ("manual", t("nav_manual")),
+            ("cleanup", t("nav_cleanup")),
+            ("tools", t("nav_tools")),
+            ("manage", t("nav_manage")),
+            ("hardware", t("nav_hardware")),
+            ("guide", t("nav_guide")),
+            ("support", t("nav_support")),
         ]
         for key, label in nav_items:
             button = ctk.CTkButton(
@@ -749,14 +901,40 @@ class KitagawaUtilitsApp(ctk.CTk):
         spacer = ctk.CTkFrame(sidebar, fg_color="transparent")
         spacer.pack(fill="both", expand=True)
 
+        language_row = ctk.CTkFrame(sidebar, fg_color="transparent")
+        language_row.pack(fill="x", padx=14, pady=(0, 8))
+        ctk.CTkLabel(
+            language_row,
+            text="🌐",
+            font=ui_font(size=14),
+            text_color=COLOR_MUTED,
+        ).pack(side="left", padx=(4, 6))
+        self.language_menu = ctk.CTkOptionMenu(
+            language_row,
+            values=[label for _code, label in LANGUAGES],
+            height=32,
+            corner_radius=8,
+            fg_color=COLOR_CARD_HOVER,
+            button_color=COLOR_ACCENT,
+            button_hover_color=COLOR_ACCENT_HOVER,
+            dropdown_fg_color=COLOR_CARD,
+            dropdown_hover_color=COLOR_CARD_HOVER,
+            font=ui_font(size=11, weight="bold"),
+            dropdown_font=ui_font(size=11),
+            command=self.change_language,
+        )
+        self.language_menu.set(LANGUAGE_LABELS.get(LANG, LANGUAGES[0][1]))
+        self.language_menu.pack(side="left", fill="x", expand=True)
+
         ctk.CTkLabel(
             sidebar,
-            text="KitagawaUtilits v6.0  ·  Windows 10/11",
+            text=f"{APP_TITLE}  ·  Windows 10/11",
             font=ui_font(size=10),
             text_color="#6B6B72",
         ).pack(anchor="w", padx=20, pady=(0, 18))
 
     def show_page(self, name: str) -> None:
+        self._current_page = name
         for key, page in self.pages.items():
             if key == name:
                 page.grid()
@@ -767,6 +945,30 @@ class KitagawaUtilitsApp(ctk.CTk):
                 button.configure(fg_color=COLOR_ACCENT, hover_color=COLOR_ACCENT_HOVER)
             else:
                 button.configure(fg_color="transparent", hover_color=COLOR_CARD_HOVER)
+
+    def change_language(self, label: str) -> None:
+        code = LABEL_TO_CODE.get(label)
+        if not code or code == LANG:
+            return
+        set_language(code)
+        self._rebuild_interface()
+
+    def _rebuild_interface(self) -> None:
+        """Мгновенно пересобирает интерфейс на выбранном языке."""
+        current = getattr(self, "_current_page", "catalog")
+        for child in list(self.winfo_children()):
+            if isinstance(child, tk.Toplevel):
+                continue
+            child.destroy()
+        self.pages = {}
+        self.nav_buttons = {}
+        self._action_widgets = []
+        self._log_collapsed = False
+        self._last_connection_state = None
+        self._build_ui()
+        self._configure_log_tags()
+        self.show_page(current)
+        self.log(t("language_changed"), "ok")
 
     def _make_scroll_page(self) -> ctk.CTkScrollableFrame:
         """Общий контейнер вкладки с прокруткой колесиком мыши."""
@@ -833,8 +1035,8 @@ class KitagawaUtilitsApp(ctk.CTk):
         ).grid(row=0, column=0, sticky="w")
         self.catalog_subtitle = ctk.CTkLabel(
             header,
-            text=(f"{len(self.firmwares)} прошивок • {len(self.brands)} брендов • "
-                  "поиск и автоопределение телефона"),
+            text=t("catalog_subtitle", firmwares=len(self.firmwares),
+                   brands=len(self.brands)),
             font=ui_font(size=12),
             text_color=COLOR_MUTED,
         )
@@ -865,7 +1067,7 @@ class KitagawaUtilitsApp(ctk.CTk):
             corner_radius=10,
             fg_color=COLOR_BG,
             border_color=COLOR_BORDER,
-            placeholder_text=SEARCH_PLACEHOLDER,
+            placeholder_text=t("search_placeholder"),
             font=ui_font(size=13),
             text_color=COLOR_TEXT,
         )
@@ -1014,7 +1216,7 @@ class KitagawaUtilitsApp(ctk.CTk):
 
     def _search_query(self) -> str:
         text = self.search_entry.get().strip()
-        if text == SEARCH_PLACEHOLDER:
+        if text == t("search_placeholder"):
             return ""
         return text
 
@@ -1032,8 +1234,8 @@ class KitagawaUtilitsApp(ctk.CTk):
         if not hasattr(self, "catalog_subtitle"):
             return
         self.catalog_subtitle.configure(
-            text=(f"{len(self.firmwares)} прошивок • {len(self.brands)} брендов • "
-                  "поиск и автоопределение телефона")
+            text=t("catalog_subtitle", firmwares=len(self.firmwares),
+                   brands=len(self.brands))
         )
 
     def refresh_catalog(self) -> None:
@@ -1135,7 +1337,7 @@ class KitagawaUtilitsApp(ctk.CTk):
                 firmware for firmware in self.firmwares
                 if query in self._search_blob(firmware)
             ]
-            self.count_label.configure(text=f"Результаты поиска: {len(entries)}")
+            self.count_label.configure(text=t("search_results", count=len(entries)))
         else:
             brand = self.brand_menu.get()
             model = self.model_menu.get()
@@ -1143,12 +1345,12 @@ class KitagawaUtilitsApp(ctk.CTk):
                 firmware for firmware in self.firmwares
                 if firmware.get("brand") == brand and firmware.get("model") == model
             ]
-            self.count_label.configure(text=f"Найдено прошивок: {len(entries)}")
+            self.count_label.configure(text=t("found_firmwares", count=len(entries)))
 
         if not entries:
             message = (
-                f"По запросу «{self._search_query()}» ничего не найдено."
-                if query else "Для выбранного устройства прошивки в каталоге не найдены."
+                t("no_results_query", query=self._search_query())
+                if query else t("no_results_device")
             )
             ctk.CTkLabel(
                 self.cards_frame,
@@ -1221,7 +1423,7 @@ class KitagawaUtilitsApp(ctk.CTk):
 
         requirements = firmware.get("requirements") or []
         if requirements:
-            requirement_text = "Что нужно: " + "  •  ".join(requirements)
+            requirement_text = t("what_needed") + "  •  ".join(requirements)
             ctk.CTkLabel(
                 left,
                 text=requirement_text,
@@ -1709,7 +1911,7 @@ class KitagawaUtilitsApp(ctk.CTk):
 
         self.cleanup_count_label = ctk.CTkLabel(
             controls,
-            text="Найдено: 0  •  Выбрано: 0",
+            text=t("cleanup_counts", found=0, selected=0),
             font=ui_font(size=11),
             text_color=COLOR_MUTED,
             anchor="w",
@@ -1828,7 +2030,7 @@ class KitagawaUtilitsApp(ctk.CTk):
         query = self.cleanup_search.get().strip().lower()
         shown = 0
         for pkg in self._scan_packages:
-            friendly = SAFE_PACKAGES.get(pkg, "Системное приложение")
+            friendly = SAFE_PACKAGES.get(pkg, tr("Системное приложение"))
             if query and query not in pkg.lower() and query not in friendly.lower():
                 continue
             var = self._cleanup_vars.setdefault(pkg, tk.BooleanVar(value=False))
@@ -1893,7 +2095,7 @@ class KitagawaUtilitsApp(ctk.CTk):
             if pkg in self._cleanup_vars and self._cleanup_vars[pkg].get()
         )
         self.cleanup_count_label.configure(
-            text=f"Найдено: {len(self._scan_packages)}  •  Выбрано: {selected}"
+            text=t("cleanup_counts", found=len(self._scan_packages), selected=selected)
         )
 
     def _toggle_select_all(self) -> None:
@@ -2216,7 +2418,7 @@ class KitagawaUtilitsApp(ctk.CTk):
 
         self.scrcpy_button = ctk.CTkButton(
             scrcpy_card,
-            text="Запустить экран телефона на ПК",
+            text=t("scrcpy_start"),
             height=44,
             corner_radius=10,
             fg_color=COLOR_ACCENT,
@@ -2538,8 +2740,8 @@ class KitagawaUtilitsApp(ctk.CTk):
         self.scrcpy_status.configure(text=text, text_color=color)
 
     def start_scrcpy(self) -> None:
-        self.scrcpy_button.configure(state="disabled", text="Проверяю телефон...")
-        self._set_scrcpy_status("Проверяю подключение телефона...", COLOR_MUTED)
+        self.scrcpy_button.configure(state="disabled", text=t("scrcpy_checking"))
+        self._set_scrcpy_status(t("scrcpy_checking_connection"), COLOR_MUTED)
         threading.Thread(target=self._scrcpy_worker, daemon=True).start()
 
     @staticmethod
@@ -2554,24 +2756,21 @@ class KitagawaUtilitsApp(ctk.CTk):
         _, devices_out = self._capture([ADB, "devices"], timeout=15.0)
         if not self._parse_adb_devices(devices_out):
             self.log("Телефон не найден для трансляции экрана.", "warn")
-            self.after(0, lambda: self._scrcpy_failed(
-                "Телефон не найден. Подключите его по USB и разрешите отладку."
-            ))
+            self.after(0, lambda: self._scrcpy_failed(t("hw_phone_not_found")))
             return
 
         exe = self._find_scrcpy()
         if exe is None:
             self.log("scrcpy не найден — скачиваю последний релиз scrcpy-win64.", "info")
             self.after(0, lambda: self._set_scrcpy_status(
-                "Скачиваю scrcpy-win64 с GitHub... Это займёт немного времени.",
-                COLOR_WARN,
+                t("scrcpy_downloading"), COLOR_WARN
             ))
             try:
                 exe = self._download_scrcpy()
             except Exception as exc:  # noqa: BLE001
                 self.log(f"Не удалось скачать scrcpy: {exc}", "error")
                 self.after(0, lambda: self._scrcpy_failed(
-                    f"Не удалось скачать scrcpy. Проверьте интернет.\n{exc}"
+                    t("scrcpy_download_failed", error=exc)
                 ))
                 return
 
@@ -2585,7 +2784,7 @@ class KitagawaUtilitsApp(ctk.CTk):
         except Exception as exc:  # noqa: BLE001
             self.log(f"Не удалось запустить scrcpy: {exc}", "error")
             self.after(0, lambda: self._scrcpy_failed(
-                f"Не удалось запустить scrcpy: {exc}"
+                t("scrcpy_failed", error=exc)
             ))
             return
 
@@ -2651,16 +2850,11 @@ class KitagawaUtilitsApp(ctk.CTk):
         return exe
 
     def _scrcpy_started(self) -> None:
-        self.scrcpy_button.configure(state="normal",
-                                     text="Запустить экран телефона на ПК")
-        self._set_scrcpy_status(
-            "Готово! Окно телефона открыто. Управляйте мышкой и клавиатурой.",
-            COLOR_OK,
-        )
+        self.scrcpy_button.configure(state="normal", text=t("scrcpy_start"))
+        self._set_scrcpy_status(t("scrcpy_started"), COLOR_OK)
 
     def _scrcpy_failed(self, message: str) -> None:
-        self.scrcpy_button.configure(state="normal",
-                                     text="Запустить экран телефона на ПК")
+        self.scrcpy_button.configure(state="normal", text=t("scrcpy_start"))
         self._set_scrcpy_status(message, COLOR_ERR)
 
     def choose_checksum_file(self) -> None:
@@ -2813,7 +3007,7 @@ class KitagawaUtilitsApp(ctk.CTk):
 
         self.manage_status_label = ctk.CTkLabel(
             status_card,
-            text="Связь: ещё не проверяли",
+            text=t("status_connection_none"),
             font=ui_font(size=13, weight="bold"),
             text_color=COLOR_MUTED,
         )
@@ -2821,7 +3015,7 @@ class KitagawaUtilitsApp(ctk.CTk):
 
         self.battery_label = ctk.CTkLabel(
             status_card,
-            text="Заряд батареи: ещё не проверяли",
+            text=t("status_battery_none"),
             font=ui_font(size=13, weight="bold"),
             text_color=COLOR_MUTED,
         )
@@ -2829,7 +3023,7 @@ class KitagawaUtilitsApp(ctk.CTk):
 
         self.bootloader_label = ctk.CTkLabel(
             status_card,
-            text="Загрузчик: ещё не проверяли",
+            text=t("status_bootloader_none"),
             font=ui_font(size=13, weight="bold"),
             text_color=COLOR_MUTED,
         )
@@ -2975,7 +3169,7 @@ class KitagawaUtilitsApp(ctk.CTk):
 
         self.hw_status = ctk.CTkLabel(
             scan_card,
-            text="Телефон ещё не сканировали.",
+            text=tr("Телефон ещё не сканировали."),
             font=ui_font(size=12),
             text_color=COLOR_MUTED,
             anchor="w",
@@ -2995,7 +3189,7 @@ class KitagawaUtilitsApp(ctk.CTk):
         self.hw_status.configure(text=text, text_color=color)
 
     def scan_hardware(self) -> None:
-        self._set_hw_status("Сканирую телефон...", COLOR_MUTED)
+        self._set_hw_status(t("hw_scanning"), COLOR_MUTED)
         self._run_task(self._scan_hardware_worker)
 
     def _scan_hardware_worker(self) -> None:
@@ -3006,9 +3200,7 @@ class KitagawaUtilitsApp(ctk.CTk):
         if code != 0 or not output.strip():
             self.log("Телефон не найден: проверьте кабель и «Отладку по USB».", "error")
             self.after(0, lambda: self._set_hw_status(
-                "Телефон не найден. Подключите кабель, включите «Отладку по USB» "
-                "и разрешите доступ на экране телефона.",
-                COLOR_ERR,
+                t("hw_phone_not_found"), COLOR_ERR
             ))
             return
 
@@ -3151,12 +3343,12 @@ class KitagawaUtilitsApp(ctk.CTk):
         if capacity and full_capacity:
             ratio = capacity / full_capacity
         if (cycles is not None and cycles >= 800) or (ratio is not None and ratio < 0.70):
-            return "Требует замены", COLOR_ERR
+            return t("health_replace"), COLOR_ERR
         if (cycles is not None and cycles >= 400) or (ratio is not None and ratio < 0.85):
-            return "Хорошее", "#C9B458"
+            return t("health_good"), "#C9B458"
         if cycles is None and ratio is None:
-            return "Хорошее", COLOR_OK
-        return "Отличное", COLOR_OK
+            return t("health_good"), COLOR_OK
+        return t("health_excellent"), COLOR_OK
 
     def _hw_card(self, parent: ctk.CTkFrame, title: str, row: int, column: int,
                  columnspan: int = 1) -> ctk.CTkFrame:
@@ -3227,7 +3419,7 @@ class KitagawaUtilitsApp(ctk.CTk):
         ).grid(row=1, column=0, sticky="w", padx=18, pady=(2, 0))
         ctk.CTkLabel(
             battery_card,
-            text=f"Состояние: {health}",
+            text=t("battery_state", health=health),
             font=ui_font(size=14, weight="bold"),
             text_color=health_color,
         ).grid(row=1, column=1, sticky="e", padx=18, pady=(2, 0))
@@ -3294,7 +3486,7 @@ class KitagawaUtilitsApp(ctk.CTk):
         self._hw_row(security_card, 4, "Тип сборки", props.get("ro.build.type") or "—")
         ctk.CTkFrame(security_card, fg_color="transparent", height=8).grid(row=5, column=0)
 
-        self._set_hw_status("Готово! Данные прочитаны прямо с телефона.", COLOR_OK)
+        self._set_hw_status(t("hw_done"), COLOR_OK)
 
     # ------------------------------ Инструкция ------------------------------
     def _build_guide_page(self) -> ctk.CTkScrollableFrame:
@@ -3458,7 +3650,7 @@ class KitagawaUtilitsApp(ctk.CTk):
 
         self.support_topic_menu = ctk.CTkOptionMenu(
             form,
-            values=SUPPORT_TOPICS,
+            values=support_topics(),
             height=40,
             corner_radius=10,
             fg_color=COLOR_CARD_HOVER,
@@ -3469,7 +3661,7 @@ class KitagawaUtilitsApp(ctk.CTk):
             font=ui_font(size=13),
             dropdown_font=ui_font(size=13),
         )
-        self.support_topic_menu.set(SUPPORT_TOPICS[0])
+        self.support_topic_menu.set(support_topics()[0])
         self.support_topic_menu.grid(row=1, column=0, sticky="ew", padx=18, pady=(0, 12))
 
         ctk.CTkLabel(
@@ -3527,7 +3719,7 @@ class KitagawaUtilitsApp(ctk.CTk):
             wrap="word",
         )
         self.support_message.grid(row=5, column=0, sticky="ew", padx=18, pady=(0, 12))
-        self.support_message.insert("1.0", SUPPORT_MESSAGE_PLACEHOLDER)
+        self.support_message.insert("1.0", t("support_message_placeholder"))
         self.support_message.bind("<FocusIn>", self._clear_support_placeholder)
         self.support_message.bind("<FocusOut>", self._restore_support_placeholder)
 
@@ -3553,7 +3745,7 @@ class KitagawaUtilitsApp(ctk.CTk):
 
         self.support_send_button = ctk.CTkButton(
             form,
-            text="Отправить разработчику",
+            text=t("support_send"),
             height=46,
             corner_radius=10,
             fg_color=COLOR_ACCENT,
@@ -3582,24 +3774,24 @@ class KitagawaUtilitsApp(ctk.CTk):
 
     def _clear_support_placeholder(self, _event=None) -> None:
         content = self.support_message.get("1.0", "end-1c")
-        if content.strip() == SUPPORT_MESSAGE_PLACEHOLDER:
+        if content.strip() == t("support_message_placeholder"):
             self.support_message.delete("1.0", "end")
             self.support_message.configure(text_color=COLOR_TEXT)
 
     def _restore_support_placeholder(self, _event=None) -> None:
         if not self._support_message_text():
             self.support_message.configure(text_color=COLOR_MUTED)
-            self.support_message.insert("1.0", SUPPORT_MESSAGE_PLACEHOLDER)
+            self.support_message.insert("1.0", t("support_message_placeholder"))
 
     def _support_message_text(self) -> str:
         content = self.support_message.get("1.0", "end-1c").strip()
-        if content == SUPPORT_MESSAGE_PLACEHOLDER:
+        if content == t("support_message_placeholder"):
             return ""
         return content
 
     def _autofill_support_model(self) -> None:
-        self.support_model_button.configure(state="disabled", text="Ищу телефон...")
-        self._set_support_status("Смотрю, какой телефон подключён по USB...", COLOR_MUTED)
+        self.support_model_button.configure(state="disabled", text=t("support_searching"))
+        self._set_support_status(t("support_searching_status"), COLOR_MUTED)
         threading.Thread(target=self._autofill_support_model_worker, daemon=True).start()
 
     def _autofill_support_model_worker(self) -> None:
@@ -3615,18 +3807,18 @@ class KitagawaUtilitsApp(ctk.CTk):
     def _apply_support_model(self, model: str) -> None:
         self.support_model_entry.delete(0, "end")
         self.support_model_entry.insert(0, model)
-        self.support_model_button.configure(state="normal", text="Определить по USB")
-        self._set_support_status(f"Модель подставлена автоматически: {model}", COLOR_OK)
+        self.support_model_button.configure(
+            state="normal", text=tr("Определить по USB")
+        )
+        self._set_support_status(t("support_model_filled", model=model), COLOR_OK)
         self.log(f"Модель для заявки: {model}", "ok")
 
     def _support_model_not_found(self) -> None:
-        self.support_model_button.configure(state="normal", text="Определить по USB")
-        self.log("Модель не определена: телефон не подключён или отладка выключена.", "warn")
-        self._set_support_status(
-            "Телефон не найден. Подключите его по USB и включите «Отладку по USB» "
-            "или впишите модель вручную.",
-            COLOR_WARN,
+        self.support_model_button.configure(
+            state="normal", text=tr("Определить по USB")
         )
+        self.log("Модель не определена: телефон не подключён или отладка выключена.", "warn")
+        self._set_support_status(t("support_model_not_found"), COLOR_WARN)
 
     def _send_support_request(self) -> None:
         topic = self.support_topic_menu.get()
@@ -3635,15 +3827,12 @@ class KitagawaUtilitsApp(ctk.CTk):
         contact = self.support_contact_entry.get().strip()
 
         if not message:
-            self._set_support_status(
-                "Напишите пару слов: какую модель добавить или что поправить.",
-                COLOR_WARN,
-            )
+            self._set_support_status(t("support_message_required"), COLOR_WARN)
             self.support_message.focus_set()
             return
 
-        self.support_send_button.configure(state="disabled", text="Отправляем...")
-        self._set_support_status("Отправляем заявку в таблицу разработчика...", COLOR_MUTED)
+        self.support_send_button.configure(state="disabled", text=t("support_sending"))
+        self._set_support_status(t("support_sending_status"), COLOR_MUTED)
         self.log(f"Отправка заявки в Formspree: {topic}", "info")
         threading.Thread(
             target=self._send_support_worker,
@@ -3682,37 +3871,31 @@ class KitagawaUtilitsApp(ctk.CTk):
         except urllib.error.HTTPError as exc:
             self.log(f"Formspree отклонил заявку: HTTP {exc.code}.", "error")
             self.after(0, lambda: self._support_send_failed(
-                f"Сервер ответил ошибкой {exc.code}. Попробуйте отправить позже."
+                t("support_http_error", code=exc.code)
             ))
             return
         except urllib.error.URLError as exc:
             reason = getattr(exc, "reason", exc)
             self.log(f"Нет связи с Formspree: {reason}", "error")
-            self.after(0, lambda: self._support_send_failed(
-                "Нет подключения к интернету. Проверьте сеть и попробуйте снова."
-            ))
+            self.after(0, lambda: self._support_send_failed(t("support_no_internet")))
             return
         except Exception as exc:  # noqa: BLE001
             self.log(f"Ошибка отправки заявки: {exc}", "error")
-            self.after(0, lambda: self._support_send_failed(
-                "Не удалось отправить заявку. Проверьте интернет и попробуйте ещё раз."
-            ))
+            self.after(0, lambda: self._support_send_failed(t("support_generic_error")))
             return
 
         self.log("Заявка успешно отправлена в таблицу разработчика.", "ok")
         self.after(0, self._support_send_succeeded)
 
     def _support_send_succeeded(self) -> None:
-        self.support_send_button.configure(state="normal", text="Отправить разработчику")
-        self._set_support_status(
-            "Спасибо! Заявка отправлена в таблицу разработчика", COLOR_OK
-        )
+        self.support_send_button.configure(state="normal", text=t("support_send"))
+        self._set_support_status(t("support_sent"), COLOR_OK)
         self.support_message.delete("1.0", "end")
         self.support_message.configure(text_color=COLOR_MUTED)
-        self.support_message.insert("1.0", SUPPORT_MESSAGE_PLACEHOLDER)
+        self.support_message.insert("1.0", t("support_message_placeholder"))
 
     def _support_send_failed(self, message: str) -> None:
-        self.support_send_button.configure(state="normal", text="Отправить разработчику")
+        self.support_send_button.configure(state="normal", text=t("support_send"))
         self._set_support_status(message, COLOR_ERR)
 
     # ------------------------------ Журнал ------------------------------
@@ -3775,10 +3958,10 @@ class KitagawaUtilitsApp(ctk.CTk):
         self._log_collapsed = not self._log_collapsed
         if self._log_collapsed:
             self.log_box.grid_remove()
-            self.log_toggle_button.configure(text="Развернуть")
+            self.log_toggle_button.configure(text=t("expand"))
         else:
             self.log_box.grid()
-            self.log_toggle_button.configure(text="Свернуть")
+            self.log_toggle_button.configure(text=t("collapse"))
 
     # ------------------------------------------------------------------
     # Логирование
@@ -4018,13 +4201,13 @@ class KitagawaUtilitsApp(ctk.CTk):
         def apply() -> None:
             if connected:
                 self.connection_badge.configure(
-                    text="●  Телефон подключён",
+                    text=t("conn_connected"),
                     fg_color="#233A31",
                     text_color="#8FD3B6",
                 )
             else:
                 self.connection_badge.configure(
-                    text="●  Ожидание USB",
+                    text=t("conn_waiting"),
                     fg_color=COLOR_CARD_HOVER,
                     text_color=COLOR_MUTED,
                 )
@@ -4036,7 +4219,7 @@ class KitagawaUtilitsApp(ctk.CTk):
             self.log("Проверка уже выполняется.", "warn")
             return
 
-        self._set_status("Проверка...", COLOR_WARN)
+        self._set_status(t("status_checking"), COLOR_WARN)
         self._start_task()
 
         def worker() -> None:
@@ -4044,7 +4227,7 @@ class KitagawaUtilitsApp(ctk.CTk):
                 self._refresh_status_worker()
             except Exception as exc:  # noqa: BLE001
                 self.log(f"Ошибка проверки: {exc}", "error")
-                self._set_status("Ошибка проверки", COLOR_ERR)
+                self._set_status(t("status_check_error"), COLOR_ERR)
             finally:
                 self._finish_task()
 
@@ -4065,7 +4248,7 @@ class KitagawaUtilitsApp(ctk.CTk):
         fastboot_devices = [line for line in fb_out.splitlines() if line.strip()]
 
         if adb_devices:
-            self._set_status(f"Телефон найден ({len(adb_devices)})", COLOR_OK)
+            self._set_status(t("status_phone_found", count=len(adb_devices)), COLOR_OK)
             self.log(f"Телефонов в обычном режиме: {len(adb_devices)}", "ok")
             for device in adb_devices:
                 self.log(f"  • {device}", "ok")
@@ -4074,19 +4257,20 @@ class KitagawaUtilitsApp(ctk.CTk):
             if level is not None:
                 color = COLOR_OK if level >= 30 else COLOR_WARN
                 self.log(f"Заряд батареи телефона: {level}%", "ok" if level >= 30 else "warn")
-                self._set_battery(f"Заряд батареи: {level}%", color)
+                self._set_battery(t("battery_level", level=level), color)
             else:
-                self._set_battery("Заряд батареи: не удалось узнать", COLOR_MUTED)
+                self._set_battery(t("battery_unknown"), COLOR_MUTED)
         elif fastboot_devices:
-            self._set_status(f"Телефон в режиме загрузчика ({len(fastboot_devices)})",
-                             COLOR_OK)
+            self._set_status(
+                t("status_bootloader_mode", count=len(fastboot_devices)), COLOR_OK
+            )
             self.log(f"Телефонов в режиме загрузчика: {len(fastboot_devices)}", "ok")
             for device in fastboot_devices:
                 self.log(f"  • {device}", "ok")
-            self._set_battery("Заряд батареи: в этом режиме недоступен", COLOR_MUTED)
+            self._set_battery(t("battery_bootloader"), COLOR_MUTED)
         else:
-            self._set_status("Телефон не найден", COLOR_ERR)
-            self._set_battery("Заряд батареи: телефон не подключён", COLOR_MUTED)
+            self._set_status(t("status_phone_not_found"), COLOR_ERR)
+            self._set_battery(t("battery_not_connected"), COLOR_MUTED)
             self.log("Подключённые телефоны не обнаружены.", "warn")
             self.log("Проверьте кабель, «Отладку по USB» и разрешение на экране телефона.",
                      "muted")
@@ -4097,12 +4281,12 @@ class KitagawaUtilitsApp(ctk.CTk):
             self.log(unlocked_out or "(нет вывода)", "info")
             value = self._parse_unlocked(unlocked_out)
             if value is None:
-                self._set_bootloader("Загрузчик: не удалось определить", COLOR_WARN)
+                self._set_bootloader(t("bootloader_unknown"), COLOR_WARN)
             elif value:
-                self._set_bootloader("Загрузчик: разблокирован", COLOR_OK)
+                self._set_bootloader(t("bootloader_unlocked"), COLOR_OK)
                 self.log("Загрузчик разблокирован — установка прошивки разрешена.", "ok")
             else:
-                self._set_bootloader("Загрузчик: заблокирован", COLOR_WARN)
+                self._set_bootloader(t("bootloader_locked"), COLOR_WARN)
                 self.log("Загрузчик заблокирован — прошивка через режим загрузчика недоступна.",
                          "warn")
 
@@ -4134,7 +4318,9 @@ class KitagawaUtilitsApp(ctk.CTk):
 
     def _set_status(self, text: str, color: str) -> None:
         def apply() -> None:
-            self.manage_status_label.configure(text=f"Связь: {text}", text_color=color)
+            self.manage_status_label.configure(
+                text=t("status_connection_prefix", text=text), text_color=color
+            )
 
         self.after(0, apply)
 
@@ -4151,7 +4337,7 @@ class KitagawaUtilitsApp(ctk.CTk):
             devices = [line for line in fb_out.splitlines() if line.strip()]
             if not devices:
                 self.log("Телефон в режиме загрузчика не найден.", "warn")
-                self._set_bootloader("Загрузчик: телефон не в режиме загрузчика", COLOR_WARN)
+                self._set_bootloader(t("bootloader_not_in_mode"), COLOR_WARN)
                 return
 
             _, unlocked_out = self._capture([FASTBOOT, "getvar", "unlocked"], timeout=15.0)
@@ -4159,13 +4345,13 @@ class KitagawaUtilitsApp(ctk.CTk):
             value = self._parse_unlocked(unlocked_out)
             if value is None:
                 self.log("Не удалось определить состояние загрузчика.", "warn")
-                self._set_bootloader("Загрузчик: неизвестно", COLOR_WARN)
+                self._set_bootloader(t("bootloader_unknown"), COLOR_WARN)
             elif value:
                 self.log("Загрузчик разблокирован.", "ok")
-                self._set_bootloader("Загрузчик: разблокирован", COLOR_OK)
+                self._set_bootloader(t("bootloader_unlocked"), COLOR_OK)
             else:
                 self.log("Загрузчик заблокирован.", "warn")
-                self._set_bootloader("Загрузчик: заблокирован", COLOR_WARN)
+                self._set_bootloader(t("bootloader_locked"), COLOR_WARN)
 
         self._run_task(worker)
 
@@ -4188,7 +4374,7 @@ class KitagawaUtilitsApp(ctk.CTk):
             self.log("Телефон не найден или отладка по USB выключена.", "error")
             self.log("Включите «Отладку по USB» и подтвердите доступ на экране телефона.",
                      "warn")
-            self._set_status("Телефон не найден", COLOR_ERR)
+            self._set_status(t("status_phone_not_found"), COLOR_ERR)
             return
 
         _, device_out = self._capture([ADB, "shell", "getprop", "ro.product.device"])
@@ -4204,7 +4390,7 @@ class KitagawaUtilitsApp(ctk.CTk):
         level = self._read_battery_level()
         if level is not None:
             self.log(f"Заряд батареи: {level}%", "ok" if level >= 30 else "warn")
-            self._set_battery(f"Заряд батареи: {level}%",
+            self._set_battery(t("battery_level", level=level),
                               COLOR_OK if level >= 30 else COLOR_WARN)
 
         match = self._find_firmware_for_device(model, codename)
