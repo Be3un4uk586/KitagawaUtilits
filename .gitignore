@@ -24,3 +24,26 @@ downloads/
 .idea/
 Thumbs.db
 desktop.ini
+
+# --- Working artifacts: temporary LibreOffice profiles ---
+_conv_profile/
+_loprofile/
+_preview_profile/
+
+# --- Working artifacts: presentation previews and frames ---
+_preview/
+_pdf/
+_frame_*.png
+_vid_*.png
+_crop_art*.png
+_emoji_test.png
+_real_shot.png
+
+# --- Working presentation/utility scripts ---
+make_presentation.py
+make_speech_pptx.py
+_convert_pdfs.py
+_render.py
+_make_qr.py
+_cleanup.py
+Текст_*.txt
