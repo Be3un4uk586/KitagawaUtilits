@@ -1,26 +1,30 @@
 """
-KitagawaUtilits v6.1.
+KitagawaUtilits v7.0.
 
 Простой и безопасный помощник для Android на Windows.
 
-Что нового в версии 6.1:
+Что нового в версии 7.0:
+  * встроенный менеджер прямого скачивания прошивок прямо в программе;
+  * живой прогресс-бар: процент, объём и скорость загрузки;
+  * скачивание в фоновом потоке с потоковой записью на диск (chunk_size = 65536);
+  * кнопка отмены загрузки и автопереход к установке после завершения;
+  * умный поиск прямой ссылки на .zip через GitHub API с запасным открытием
+    страницы релиза в браузере;
+  * скачанные архивы сохраняются в Downloads\\KitagawaFirmwares;
   * 5 языков интерфейса: русский, English, Українська, Español, 中文;
   * выбор языка в боковой панели с мгновенным переводом без перезапуска;
-  * выбор языка сохраняется в %LOCALAPPDATA%\\KitagawaUtilits\\settings.json;
-  * живое обновление каталога прошивок прямо из GitHub-репозитория;
-  * перевод вкладок, кнопок, статусов, карточек диагностики и формы поддержки.
+  * живое обновление каталога прошивок прямо из GitHub-репозитория.
 
-Возможности версии 6.0:
+Возможности версии 6.x:
   * вкладка «Здоровье и железо»: батарея, циклы, железо и безопасность через ADB;
   * трансляция экрана телефона на ПК через scrcpy с управлением мышкой;
-  * обновление каталога прошивок из интернета и кэш в LOCALAPPDATA;
   * в каталог добавлены Android-планшеты 2020–2026 с пометкой [Планшет];
   * анимированная заставка, вкладка «Поддержка и идеи» и форма Formspree;
   * плавная прокрутка на всех вкладках — нижние кнопки всегда доступны;
   * защита от «окирпичивания»: проверка заряда батареи перед прошивкой и очисткой;
   * безопасная очистка от рекламы и мусора без Root;
   * помощник с драйверами Google, установкой .apk и проверкой хешей прошивки;
-  * каталог из 600+ прошивок и пошаговая инструкция для новичков.
+  * каталог из 800+ прошивок и пошаговая инструкция для новичков.
 """
 
 import ctypes
@@ -54,9 +58,9 @@ except Exception:  # noqa: BLE001
 # Константы
 # ---------------------------------------------------------------------------
 APP_NAME = "KitagawaUtilits"
-APP_VERSION = "6.1.0"
+APP_VERSION = "7.0.0"
 APP_SUBTITLE = "Простой и безопасный помощник для Android"
-APP_TITLE = "KitagawaUtilits v6.1"
+APP_TITLE = "KitagawaUtilits v7.0"
 
 # Скрывает консольное окно Windows при запуске дочерних процессов.
 CREATE_NO_WINDOW = 0x08000000
@@ -242,7 +246,11 @@ GUIDE_STEPS = [
         "paragraphs": [
             "Открой «Прошивки», выбери бренд и модель. Если телефон подключён, нажми "
             "«Определить телефон» — программа сама подставит нужное устройство.",
-            "Нажми «Скачать прошивку». Файл сохранится в папку downloads рядом с программой.",
+            "Нажми «📥 Скачать в программу». Программа сама скачает архив с живым "
+            "прогресс-баром, объёмом и скоростью загрузки, а файл сохранится в папку "
+            "Downloads\\KitagawaFirmwares.",
+            "Когда загрузка закончится, нажми «⚡ Перейти к установке» — путь к файлу "
+            "подставится автоматически.",
             "Перед установкой проверь файл во вкладке «Помощник и APK»: посчитай хеш "
             "и сравни с хешем на сайте производителя.",
         ],
@@ -320,6 +328,11 @@ FASTBOOT = os.path.join(TOOLS_DIR, "fastboot.exe")
 FIRMWARES_FILE = resource_path("firmwares.json")
 DOWNLOADS_DIR = os.path.join(application_dir(), "downloads")
 REMOVED_FILE = os.path.join(application_dir(), "removed_packages.json")
+
+# Встроенный загрузчик сохраняет прошивки в «Загрузки» пользователя.
+FIRMWARE_DOWNLOAD_DIR = os.path.join(
+    os.path.expanduser("~"), "Downloads", "KitagawaFirmwares"
+)
 
 # Локальные данные программы: кэш каталога и scrcpy.
 LOCAL_DATA_DIR = os.path.join(
@@ -484,6 +497,294 @@ _patch_file_dialogs()
 def popen_flags() -> int:
     """Флаги создания процесса: без консольного окна на Windows."""
     return CREATE_NO_WINDOW if os.name == "nt" else 0
+
+
+def format_size(num: float) -> str:
+    """Человекочитаемый размер: 12.4 МБ, 1.80 ГБ, 512.0 КБ."""
+    try:
+        value = float(num)
+    except (TypeError, ValueError):
+        value = 0.0
+    if value < 1024:
+        return f"{int(value)} Б"
+    value /= 1024.0
+    if value < 1024:
+        return f"{value:.1f} КБ"
+    value /= 1024.0
+    if value < 1024:
+        return f"{value:.1f} МБ"
+    value /= 1024.0
+    return f"{value:.2f} ГБ"
+
+
+class DownloadCancelled(Exception):
+    """Пользователь отменил скачивание прошивки."""
+
+
+class FirmwareDownloader:
+    """Прямое скачивание прошивки в фоновом потоке.
+
+    Особенности:
+      * потоковая запись на диск кусками по 64 КБ — память не растёт
+        даже при скачивании архивов на 3–5 ГБ;
+      * прогресс, объём и скорость загрузки через колбэки в UI-поток;
+      * отмена через threading.Event;
+      * умный поиск прямой ссылки на .zip: GitHub API, затем разбор HTML,
+        затем запасное открытие страницы релиза в браузере.
+    """
+
+    CHUNK_SIZE = 65536
+    USER_AGENT = (
+        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
+        "(KHTML, like Gecko) Chrome/124.0 Safari/537.36 KitagawaUtilits/7.0"
+    )
+    FILE_EXTENSIONS = (
+        ".zip", ".img", ".bin", ".tar", ".tar.gz", ".tgz",
+        ".7z", ".rar", ".xz", ".gz",
+    )
+    GITHUB_RE = re.compile(
+        r"^https?://(?:www\.)?github\.com/([^/]+)/([^/]+)/releases"
+        r"(?:/(?:tag|download)/([^/?#]+))?",
+        re.IGNORECASE,
+    )
+    HTML_LINK_RE = re.compile(
+        r"""(?:href|src|data-url)\s*=\s*["']([^"']+?\.(?:zip|img|bin|tar\.gz|tgz|7z|rar|xz))["']""",
+        re.IGNORECASE,
+    )
+
+    def __init__(self, app, firmware: dict, on_progress=None, on_status=None,
+                 on_done=None, on_fallback=None, on_error=None,
+                 on_cancel=None) -> None:
+        self.app = app
+        self.firmware = firmware or {}
+        self.on_progress = on_progress
+        self.on_status = on_status
+        self.on_done = on_done
+        self.on_fallback = on_fallback
+        self.on_error = on_error
+        self.on_cancel = on_cancel
+
+        self.cancel_event = threading.Event()
+        self._thread: threading.Thread | None = None
+        self.downloaded = 0
+        self.total = 0
+        self.speed = 0.0
+        self.path = ""
+
+    # ------------------------------------------------------------------
+    # Управление потоком
+    # ------------------------------------------------------------------
+    def is_running(self) -> bool:
+        return self._thread is not None and self._thread.is_alive()
+
+    def start(self) -> None:
+        if self.is_running():
+            return
+        self._thread = threading.Thread(target=self._run, daemon=True)
+        self._thread.start()
+
+    def cancel(self) -> None:
+        self.cancel_event.set()
+
+    def _emit(self, callback, *args) -> None:
+        """Безопасно вызывает UI-колбэк из рабочего потока."""
+        if callback is None:
+            return
+        try:
+            self.app.after(0, lambda: callback(*args))
+        except Exception:  # noqa: BLE001
+            pass
+
+    # ------------------------------------------------------------------
+    # Поиск прямой ссылки
+    # ------------------------------------------------------------------
+    @classmethod
+    def is_direct_url(cls, url: str) -> bool:
+        try:
+            path = urllib.parse.urlparse(url).path.lower()
+        except Exception:  # noqa: BLE001
+            return False
+        return path.endswith(cls.FILE_EXTENSIONS)
+
+    @classmethod
+    def _request(cls, url: str, accept: str | None = None) -> urllib.request.Request:
+        headers = {"User-Agent": cls.USER_AGENT}
+        if accept:
+            headers["Accept"] = accept
+        return urllib.request.Request(url, headers=headers)
+
+    def _resolve_github(self, url: str) -> str | None:
+        match = self.GITHUB_RE.match(url)
+        if not match:
+            return None
+        owner, repo, tag = match.groups()
+        if tag and "/releases/download/" in url:
+            return None
+        if tag:
+            api = f"https://api.github.com/repos/{owner}/{repo}/releases/tags/{tag}"
+        else:
+            api = f"https://api.github.com/repos/{owner}/{repo}/releases/latest"
+        try:
+            request = self._request(api, "application/vnd.github+json")
+            with urllib.request.urlopen(request, timeout=20) as response:
+                data = json.loads(response.read().decode("utf-8", "replace"))
+        except Exception:  # noqa: BLE001
+            return None
+
+        assets = data.get("assets") if isinstance(data, dict) else None
+        if not isinstance(assets, list):
+            return None
+        candidates: list[str] = []
+        for asset in assets:
+            if not isinstance(asset, dict):
+                continue
+            link = asset.get("browser_download_url")
+            name = str(asset.get("name") or link or "").lower()
+            if isinstance(link, str) and name.endswith(self.FILE_EXTENSIONS):
+                candidates.append(link)
+        if not candidates:
+            return None
+        candidates.sort(key=lambda item: (0 if item.lower().endswith(".zip") else 1, len(item)))
+        return candidates[0]
+
+    def _resolve_html(self, url: str) -> str | None:
+        try:
+            request = self._request(url, "text/html,application/xhtml+xml")
+            with urllib.request.urlopen(request, timeout=20) as response:
+                raw = response.read(512 * 1024)
+                charset = response.headers.get_content_charset() or "utf-8"
+            html = raw.decode(charset, "replace")
+        except Exception:  # noqa: BLE001
+            return None
+
+        for candidate in self.HTML_LINK_RE.findall(html):
+            candidate = candidate.strip()
+            if candidate.startswith("//"):
+                candidate = "https:" + candidate
+            elif not candidate.lower().startswith(("http://", "https://")):
+                candidate = urllib.parse.urljoin(url, candidate)
+            if candidate.lower().endswith(self.FILE_EXTENSIONS):
+                return candidate
+        return None
+
+    def resolve_url(self, url: str) -> str | None:
+        """Возвращает прямую ссылку на архив или None, если её не найти."""
+        if self.is_direct_url(url):
+            return url
+        github = self._resolve_github(url)
+        if github:
+            return github
+        return self._resolve_html(url)
+
+    # ------------------------------------------------------------------
+    # Скачивание
+    # ------------------------------------------------------------------
+    @staticmethod
+    def _filename(url: str, firmware: dict) -> str:
+        path = urllib.parse.urlparse(url).path
+        name = os.path.basename(urllib.parse.unquote(path))
+        if not name or "." not in name:
+            name = f"{firmware.get('id', 'firmware')}.zip"
+        name = re.sub(r'[<>:"/\\|?*]', "_", name)
+        return name or "firmware.zip"
+
+    @staticmethod
+    def _unique_path(directory: str, filename: str) -> str:
+        target = os.path.join(directory, filename)
+        if not os.path.exists(target):
+            return target
+        stem, extension = os.path.splitext(filename)
+        index = 1
+        while os.path.exists(os.path.join(directory, f"{stem} ({index}){extension}")):
+            index += 1
+        return os.path.join(directory, f"{stem} ({index}){extension}")
+
+    @staticmethod
+    def _remove_quietly(path: str) -> None:
+        try:
+            if path and os.path.exists(path):
+                os.remove(path)
+        except OSError:
+            pass
+
+    def _run(self) -> None:
+        url = self.firmware.get("download_url") or self.firmware.get("page_url") or ""
+        if not url:
+            self._emit(self.on_error, "в каталоге нет ссылки на прошивку")
+            return
+
+        self._emit(self.on_status, "resolving")
+        try:
+            direct = self.resolve_url(url)
+        except Exception:  # noqa: BLE001
+            direct = None
+
+        if not direct:
+            self._emit(self.on_fallback, url)
+            return
+
+        self._emit(self.on_status, "downloading")
+        try:
+            self._download(direct)
+        except DownloadCancelled:
+            self._emit(self.on_cancel)
+        except Exception as exc:  # noqa: BLE001
+            self._emit(self.on_error, str(exc))
+
+    def _download(self, url: str) -> None:
+        os.makedirs(FIRMWARE_DOWNLOAD_DIR, exist_ok=True)
+        filename = self._filename(url, self.firmware)
+        target = self._unique_path(FIRMWARE_DOWNLOAD_DIR, filename)
+        temp = target + ".part"
+
+        self.downloaded = 0
+        self.total = 0
+        self.speed = 0.0
+        last_time = time.time()
+        last_bytes = 0
+
+        request = self._request(url)
+        try:
+            with urllib.request.urlopen(request, timeout=30) as response, \
+                    open(temp, "wb") as output:
+                self.total = int(response.headers.get("Content-Length") or 0)
+                self._emit(self.on_progress, 0, self.total, 0.0)
+
+                while True:
+                    if self.cancel_event.is_set():
+                        raise DownloadCancelled()
+                    chunk = response.read(self.CHUNK_SIZE)
+                    if not chunk:
+                        break
+                    output.write(chunk)
+                    self.downloaded += len(chunk)
+                    now = time.time()
+                    if now - last_time >= 0.2:
+                        instant = (self.downloaded - last_bytes) / max(now - last_time, 1e-6)
+                        self.speed = (
+                            instant if self.speed <= 0
+                            else self.speed * 0.6 + instant * 0.4
+                        )
+                        last_time = now
+                        last_bytes = self.downloaded
+                        self._emit(self.on_progress, self.downloaded,
+                                   self.total, self.speed)
+
+            if self.cancel_event.is_set():
+                raise DownloadCancelled()
+            if self.total <= 0:
+                self.total = self.downloaded
+            os.replace(temp, target)
+        except DownloadCancelled:
+            self._remove_quietly(temp)
+            raise
+        except Exception:
+            self._remove_quietly(temp)
+            raise
+
+        self.path = target
+        self._emit(self.on_progress, self.downloaded, self.total, self.speed)
+        self._emit(self.on_done, target)
 
 
 class SplashScreen:
@@ -1482,9 +1783,12 @@ class KitagawaUtilitsApp(ctk.CTk):
             text_color=badge_fg,
         ).grid(row=3, column=0, sticky="w")
 
+        # Состояние загрузки именно этой карточки.
+        download_state: dict = {"downloader": None, "path": "", "determinate": False}
+
         download_button = ctk.CTkButton(
             right,
-            text="Скачать прошивку",
+            text=t("dl_download"),
             width=220,
             height=46,
             corner_radius=10,
@@ -1511,7 +1815,7 @@ class KitagawaUtilitsApp(ctk.CTk):
         if not firmware.get("direct"):
             ctk.CTkLabel(
                 right,
-                text="Откроется официальная страница загрузки",
+                text=t("dl_page_hint"),
                 font=ui_font(size=10),
                 text_color=COLOR_WARN,
                 wraplength=220,
@@ -1544,10 +1848,26 @@ class KitagawaUtilitsApp(ctk.CTk):
         )
         status_label.grid(row=1, column=0, sticky="w", pady=(4, 0))
 
+        cancel_button = ctk.CTkButton(
+            progress_frame,
+            text=t("dl_cancel"),
+            height=28,
+            corner_radius=8,
+            fg_color=COLOR_CARD_HOVER,
+            hover_color="#2A2D35",
+            text_color=COLOR_TEXT,
+            font=ui_font(size=11),
+            command=lambda state=download_state: self._cancel_download(state),
+        )
+        cancel_button.grid(row=2, column=0, sticky="ew", pady=(6, 0))
+        cancel_button.grid_remove()
+
         download_button.configure(
             command=lambda fw=firmware, button=download_button,
-            progress=progress_bar, frame=progress_frame,
-            status=status_label: self._start_download(fw, button, progress, frame, status)
+            cancel=cancel_button, progress=progress_bar, frame=progress_frame,
+            status=status_label, state=download_state: self._start_download(
+                fw, button, cancel, progress, frame, status, state
+            )
         )
 
     @staticmethod
@@ -4471,126 +4791,163 @@ class KitagawaUtilitsApp(ctk.CTk):
     # Скачивание архивов
     # ------------------------------------------------------------------
     @staticmethod
-    def _download_filename(url: str, firmware: dict) -> str:
-        path = urllib.parse.urlparse(url).path
-        name = os.path.basename(urllib.parse.unquote(path))
-        if not name or "." not in name:
-            name = f"{firmware.get('id', 'firmware')}.zip"
-        name = re.sub(r'[<>:"/\\|?*]', "_", name)
-        return name or "firmware.zip"
-
-    @staticmethod
-    def _unique_path(directory: str, filename: str) -> str:
-        target = os.path.join(directory, filename)
-        if not os.path.exists(target):
-            return target
-        stem, extension = os.path.splitext(filename)
-        index = 1
-        while os.path.exists(os.path.join(directory, f"{stem} ({index}){extension}")):
-            index += 1
-        return os.path.join(directory, f"{stem} ({index}){extension}")
+    def _cancel_download(state: dict) -> None:
+        downloader = state.get("downloader")
+        if downloader is not None:
+            downloader.cancel()
 
     def _start_download(self, firmware: dict, button: ctk.CTkButton,
-                        progress: ctk.CTkProgressBar, frame: ctk.CTkFrame,
-                        status: ctk.CTkLabel) -> None:
+                        cancel_button: ctk.CTkButton, progress: ctk.CTkProgressBar,
+                        frame: ctk.CTkFrame, status: ctk.CTkLabel,
+                        state: dict) -> None:
+        downloader = state.get("downloader")
+        if downloader is not None and downloader.is_running():
+            return
+
         url = firmware.get("download_url") or firmware.get("page_url") or ""
-
-        if not firmware.get("direct"):
-            if url:
-                self.log(f"Открываю официальную страницу загрузки: {url}", "warn")
-                self.after(0, lambda: webbrowser.open(url))
-            else:
-                self.log("Для этой прошивки не указана ссылка.", "error")
-            return
-
-        if not url:
-            self.log("Для этой прошивки не указана ссылка.", "error")
-            return
-
         frame.grid()
+        progress.stop()
         progress.configure(mode="determinate")
         progress.set(0)
-        status.configure(text="Подключение к серверу...", text_color=COLOR_MUTED)
-        button.configure(state="disabled", text="Загрузка...")
+        status.configure(text=t("dl_resolving"), text_color=COLOR_MUTED)
+        button.configure(state="disabled", text=t("dl_downloading"))
+        cancel_button.configure(state="normal")
+        cancel_button.grid()
+        state["determinate"] = False
+        state["indeterminate"] = False
+        state["path"] = ""
 
         self.log(f"=== Загрузка: {firmware.get('os')} {firmware.get('os_version', '')}".strip(),
                  "section")
-        self.log(f"URL: {url}", "cmd")
+        if url:
+            self.log(f"URL: {url}", "cmd")
 
-        def worker() -> None:
-            target = ""
+        def on_status(kind: str) -> None:
             try:
-                os.makedirs(DOWNLOADS_DIR, exist_ok=True)
-                filename = self._download_filename(url, firmware)
-                target = self._unique_path(DOWNLOADS_DIR, filename)
+                if kind == "resolving":
+                    status.configure(text=t("dl_resolving"), text_color=COLOR_MUTED)
+                else:
+                    status.configure(text=t("dl_connecting"), text_color=COLOR_MUTED)
+            except Exception:  # noqa: BLE001
+                pass
 
-                request = urllib.request.Request(
-                    url,
-                    headers={"User-Agent": f"{APP_NAME}/{APP_VERSION}"},
+        def on_progress(downloaded: int, total: int, speed: float) -> None:
+            try:
+                if total and total > 0:
+                    if not state.get("determinate"):
+                        progress.stop()
+                        progress.configure(mode="determinate")
+                        state["determinate"] = True
+                    progress.set(min(downloaded / total, 1.0))
+                    percent = int(downloaded * 100 / max(total, 1))
+                    text = (f"{percent}%  •  {format_size(downloaded)} / "
+                            f"{format_size(total)}  •  {format_size(speed)}/с")
+                else:
+                    if not state.get("indeterminate"):
+                        progress.stop()
+                        progress.configure(mode="indeterminate")
+                        progress.start()
+                        state["indeterminate"] = True
+                    text = f"{format_size(downloaded)}  •  {format_size(speed)}/с"
+                status.configure(text=text, text_color=COLOR_MUTED)
+            except Exception:  # noqa: BLE001
+                pass
+
+        def on_done(path: str) -> None:
+            state["downloader"] = None
+            state["path"] = path
+            try:
+                progress.stop()
+                progress.configure(mode="determinate")
+                progress.set(1)
+                status.configure(
+                    text=t("dl_done", name=os.path.basename(path)),
+                    text_color=COLOR_OK,
                 )
-                with urllib.request.urlopen(request, timeout=30) as response, \
-                        open(target, "wb") as output:
-                    total = int(response.headers.get("Content-Length") or 0)
-                    downloaded = 0
-                    last_update = [0.0]
+                cancel_button.grid_remove()
+                button.configure(state="normal", text=t("dl_goto_install"))
+                button.configure(
+                    command=lambda fw=firmware, p=path: self._install_downloaded(fw, p)
+                )
+            except Exception:  # noqa: BLE001
+                pass
+            self.log(f"Прошивка скачана: {path}", "ok")
+            self.log(t("dl_saved_hint"), "muted")
 
-                    if total <= 0:
-                        self.after(0, progress.start)
+        def on_fallback(page_url: str) -> None:
+            state["downloader"] = None
+            try:
+                progress.stop()
+                progress.configure(mode="determinate")
+                progress.set(0)
+                cancel_button.grid_remove()
+                button.configure(state="normal", text=t("dl_download"))
+                status.configure(text=t("dl_fallback"), text_color=COLOR_WARN)
+            except Exception:  # noqa: BLE001
+                pass
+            self.log(t("dl_fallback"), "warn")
+            if page_url:
+                self.log(f"Страница загрузки: {page_url}", "muted")
+                try:
+                    webbrowser.open(page_url)
+                except Exception:  # noqa: BLE001
+                    pass
 
-                    while True:
-                        chunk = response.read(65536)
-                        if not chunk:
-                            break
-                        output.write(chunk)
-                        downloaded += len(chunk)
-                        now = time.time()
-                        if total > 0 and (now - last_update[0] > 0.2 or downloaded >= total):
-                            last_update[0] = now
-                            self.after(0, progress.set, min(downloaded / total, 1.0))
-                            progress_text = (f"{downloaded / 1048576:.1f} / "
-                                             f"{total / 1048576:.1f} МБ")
-                            self.after(
-                                0,
-                                lambda text=progress_text: status.configure(
-                                    text=text, text_color=COLOR_MUTED
-                                ),
-                            )
-                        elif total <= 0 and now - last_update[0] > 0.5:
-                            last_update[0] = now
-                            progress_text = f"Скачано {downloaded / 1048576:.1f} МБ"
-                            self.after(
-                                0,
-                                lambda text=progress_text: status.configure(
-                                    text=text, text_color=COLOR_MUTED
-                                ),
-                            )
+        def on_error(message: str) -> None:
+            state["downloader"] = None
+            try:
+                progress.stop()
+                progress.configure(mode="determinate")
+                progress.set(0)
+                cancel_button.grid_remove()
+                button.configure(state="normal", text=t("dl_download"))
+                status.configure(text=t("dl_error", error=message), text_color=COLOR_ERR)
+            except Exception:  # noqa: BLE001
+                pass
+            self.log(f"Ошибка загрузки: {message}", "error")
 
-                size_mb = os.path.getsize(target) / 1048576
-                self.log(f"Загрузка завершена: {target} ({size_mb:.1f} МБ)", "ok")
-                self.log("Совет: проверьте файл во вкладке «Помощник и APK» перед установкой.",
-                         "muted")
+        def on_cancel() -> None:
+            state["downloader"] = None
+            try:
+                progress.stop()
+                progress.configure(mode="determinate")
+                progress.set(0)
+                cancel_button.grid_remove()
+                button.configure(state="normal", text=t("dl_download"))
+                status.configure(text=t("dl_cancelled"), text_color=COLOR_WARN)
+            except Exception:  # noqa: BLE001
+                pass
+            self.log(t("dl_cancelled"), "warn")
 
-                def done() -> None:
-                    progress.stop()
-                    progress.configure(mode="determinate")
-                    progress.set(1)
-                    status.configure(text=f"Сохранено: {target}", text_color=COLOR_OK)
-                    button.configure(state="normal", text="Скачать прошивку")
+        downloader = FirmwareDownloader(
+            self,
+            firmware,
+            on_progress=on_progress,
+            on_status=on_status,
+            on_done=on_done,
+            on_fallback=on_fallback,
+            on_error=on_error,
+            on_cancel=on_cancel,
+        )
+        state["downloader"] = downloader
+        downloader.start()
 
-                self.after(0, done)
-            except Exception as exc:  # noqa: BLE001
-                self.log(f"Ошибка загрузки: {exc}", "error")
+    def _install_downloaded(self, firmware: dict, path: str) -> None:
+        """Переход во вкладку установки с уже подставленным файлом."""
+        if not path or not os.path.isfile(path):
+            messagebox.showwarning(APP_NAME, t("dl_file_missing"), parent=self)
+            return
 
-                def failed() -> None:
-                    progress.stop()
-                    progress.configure(mode="determinate")
-                    progress.set(0)
-                    status.configure(text=f"Ошибка: {exc}", text_color=COLOR_ERR)
-                    button.configure(state="normal", text="Скачать прошивку")
+        if os.path.splitext(path)[1].lower() == ".img":
+            self._img_path = path
+            self._set_entry_text(self.img_entry, path)
+            self.log(f"Образ подставлен для прошивки: {path}", "ok")
+        else:
+            self._zip_path = path
+            self._set_entry_text(self.zip_entry, path)
+            self.log(f"Архив подставлен для установки: {path}", "ok")
 
-                self.after(0, failed)
-
-        threading.Thread(target=worker, daemon=True).start()
+        self._goto_flash(firmware)
 
     # ------------------------------------------------------------------
     # Выбор файлов
