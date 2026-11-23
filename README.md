@@ -45,12 +45,12 @@
 
 ## ✨ Возможности
 
-### 📦 Каталог прошивок на 600+ устройств
+### 📦 Каталог прошивок на 800+ устройств
 
 | Что внутри | Подробности |
 |---|---|
-| **600+ прошивок** | Смартфоны и планшеты **2020–2026** годов от **22 брендов** |
-| **Бренды** | Vivo, iQOO, Xiaomi, Redmi, POCO, Samsung, Google, OnePlus, OPPO, Realme, Lenovo, Honor, Huawei, Sony, Nubia, RedMagic, Nothing, Motorola, ASUS |
+| **800+ прошивок** | Смартфоны и планшеты **2020–2026** годов от **23 брендов** |
+| **Бренды** | Vivo, iQOO, Xiaomi, Redmi, POCO, Samsung, Google, OnePlus, OPPO, Realme, Lenovo, Honor, Huawei, Sony, Nubia, RedMagic, Nothing, Motorola, ASUS, Tecno, Infinix, Itel, Meizu |
 | **Планшеты** | Xiaomi Pad, Redmi Pad, Galaxy Tab, Lenovo Tab, OnePlus Pad, OPPO Pad, Realme Pad, Pixel Tablet, Honor Pad, Vivo/iQOO Pad — помечены `[Планшет]` |
 | **Живой поиск** | По модели, кодовому имени и названию системы (OriginOS, HyperOS, One UI и т. д.) |
 | **Автоопределение** | Программа сама распознаёт подключённый телефон и предлагает подходящие файлы |
@@ -223,7 +223,7 @@ pyinstaller --noconfirm --clean --onefile --noconsole --icon=app.ico --name Kita
 KitagawaUtilits/
 ├─ main.py                 # интерфейс и вся логика приложения
 ├─ locales.json            # переводы интерфейса (ru, en, uk, es, zh)
-├─ firmwares.json          # каталог прошивок (600+ устройств)
+├─ firmwares.json          # каталог прошивок (800+ устройств)
 ├─ app.ico                 # фирменная иконка приложения
 ├─ Инструкция.txt          # пошаговая инструкция для новичков
 ├─ requirements.txt        # зависимости Python

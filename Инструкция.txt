@@ -35,9 +35,10 @@
 ЧТО УМЕЕТ ПРОГРАММА
 ================================================================
 
-• Каталог из 650+ прошивок для 22 брендов: Vivo, iQOO, Xiaomi,
+• Каталог из 800+ прошивок для 23 брендов: Vivo, iQOO, Xiaomi,
   Redmi, POCO, Samsung, Google, OnePlus, OPPO, Realme, Lenovo,
-  Honor, Huawei, Sony, Nubia, RedMagic, Nothing, Motorola, ASUS.
+  Honor, Huawei, Sony, Nubia, RedMagic, Nothing, Motorola, ASUS,
+  Tecno, Infinix, Itel, Meizu.
 • Большая подборка прошивок для Android-планшетов 2020–2026:
   Xiaomi Pad, Redmi Pad, Galaxy Tab, Lenovo Tab, OnePlus Pad,
   OPPO Pad, Realme Pad, Pixel Tablet, Honor Pad, Vivo/iQOO Pad.

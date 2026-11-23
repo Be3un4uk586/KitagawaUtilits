@@ -1,7 +1,7 @@
 {
   "schema_version": 4.2,
   "app": "KitagawaUtilits",
-  "updated": "2026-11-21",
+  "updated": "2026-11-23",
   "firmwares": [
     {
       "id": "vivo-x100-originos-5",
@@ -17381,6 +17381,3003 @@
       ],
       "notes": "Официальная прошивка OriginOS 5 для планшета iQOO Pad 2 Pro.",
       "tablet": true
+    },
+    {
+      "id": "redmi-redmi-a2-redmi-a2-plus-android-13-go-stock",
+      "brand": "Redmi",
+      "model": "Redmi A2 / Redmi A2+",
+      "codename": "water",
+      "os": "Android 13 Go (Stock)",
+      "os_version": "V14.0.4.0.TGOMIXM",
+      "android": "13",
+      "install_type": "local_update",
+      "region": "Global",
+      "size": "~2.2 GB",
+      "download_url": "https://www.mi.com/global/support/",
+      "page_url": "https://www.mi.com/global/support/",
+      "direct": false,
+      "requirements": [
+        "Официальный пакет производителя",
+        "Заряд телефона не менее 50%",
+        "Свободное место не менее 8 ГБ"
+      ],
+      "warnings": [
+        "Используйте пакет строго для своей модели и региона.",
+        "Перед обновлением сделайте резервную копию данных."
+      ],
+      "notes": "Android 13 Go (Stock) V14.0.4.0.TGOMIXM для Redmi A2 / Redmi A2+ (water). Официальная стабильная сборка Android Go. Устройство работает на Android Go / MediaTek Helio G36; для кастомных сборок нужна разблокировка загрузчика через Fastboot (Mi Unlock)."
+    },
+    {
+      "id": "redmi-redmi-a2-redmi-a2-plus-lineageos-20-gsi",
+      "brand": "Redmi",
+      "model": "Redmi A2 / Redmi A2+",
+      "codename": "water",
+      "os": "LineageOS 20 (GSI)",
+      "os_version": "20.0-20240615",
+      "android": "13",
+      "install_type": "fastboot",
+      "region": "Global",
+      "size": "~1.4 GB",
+      "download_url": "https://download.lineageos.org/",
+      "page_url": "https://download.lineageos.org/",
+      "direct": false,
+      "requirements": [
+        "Разблокированный загрузчик",
+        "Platform-Tools / Fastboot",
+        "Заряд телефона не менее 50%"
+      ],
+      "warnings": [
+        "Установка кастомной прошивки стирает данные.",
+        "Не блокируйте загрузчик с кастомной прошивкой.",
+        "Проверьте совместимость сборки с кодовым именем устройства."
+      ],
+      "notes": "LineageOS 20 (GSI) 20.0-20240615 для Redmi A2 / Redmi A2+ (water). GSI-сборка: fastboot flash system; возможны ограничения камеры и звонков. Устройство работает на Android Go / MediaTek Helio G36; для кастомных сборок нужна разблокировка загрузчика через Fastboot (Mi Unlock)."
+    },
+    {
+      "id": "redmi-redmi-a2-redmi-a2-plus-crdroid-9",
+      "brand": "Redmi",
+      "model": "Redmi A2 / Redmi A2+",
+      "codename": "water",
+      "os": "crDroid 9",
+      "os_version": "9.12",
+      "android": "13",
+      "install_type": "adb_sideload",
+      "region": "Global",
+      "size": "~1.3 GB",
+      "download_url": "https://crdroid.net/",
+      "page_url": "https://crdroid.net/",
+      "direct": false,
+      "requirements": [
+        "Разблокированный загрузчик",
+        "Кастомный recovery (TWRP / Lineage Recovery)",
+        "Заряд телефона не менее 50%"
+      ],
+      "warnings": [
+        "Установка кастомной прошивки стирает данные.",
+        "Не блокируйте загрузчик с кастомной прошивкой.",
+        "Сделайте резервную копию перед установкой."
+      ],
+      "notes": "crDroid 9 9.12 для Redmi A2 / Redmi A2+ (water). Сборка на базе Android 13 для MediaTek Helio G36. Устройство работает на Android Go / MediaTek Helio G36; для кастомных сборок нужна разблокировка загрузчика через Fastboot (Mi Unlock)."
+    },
+    {
+      "id": "redmi-redmi-a2-redmi-a2-plus-pixelos-14-gsi-lite",
+      "brand": "Redmi",
+      "model": "Redmi A2 / Redmi A2+",
+      "codename": "water",
+      "os": "PixelOS 14 (GSI, Lite)",
+      "os_version": "14.0-20241020",
+      "android": "14",
+      "install_type": "fastboot",
+      "region": "Global",
+      "size": "~1.5 GB",
+      "download_url": "https://pixelos.net/",
+      "page_url": "https://pixelos.net/",
+      "direct": false,
+      "requirements": [
+        "Разблокированный загрузчик",
+        "Platform-Tools / Fastboot",
+        "Заряд телефона не менее 50%"
+      ],
+      "warnings": [
+        "Установка кастомной прошивки стирает данные.",
+        "Не блокируйте загрузчик с кастомной прошивкой.",
+        "Проверьте совместимость сборки с кодовым именем устройства."
+      ],
+      "notes": "PixelOS 14 (GSI, Lite) 14.0-20241020 для Redmi A2 / Redmi A2+ (water). Лёгкая GSI-сборка без лишних сервисов. Устройство работает на Android Go / MediaTek Helio G36; для кастомных сборок нужна разблокировка загрузчика через Fastboot (Mi Unlock)."
+    },
+    {
+      "id": "redmi-redmi-a1-redmi-a1-plus-android-12-go-stock",
+      "brand": "Redmi",
+      "model": "Redmi A1 / Redmi A1+",
+      "codename": "ice",
+      "os": "Android 12 Go (Stock)",
+      "os_version": "V13.0.3.0.SGOMIXM",
+      "android": "12",
+      "install_type": "local_update",
+      "region": "Global",
+      "size": "~1.9 GB",
+      "download_url": "https://www.mi.com/global/support/",
+      "page_url": "https://www.mi.com/global/support/",
+      "direct": false,
+      "requirements": [
+        "Официальный пакет производителя",
+        "Заряд телефона не менее 50%",
+        "Свободное место не менее 8 ГБ"
+      ],
+      "warnings": [
+        "Используйте пакет строго для своей модели и региона.",
+        "Перед обновлением сделайте резервную копию данных."
+      ],
+      "notes": "Android 12 Go (Stock) V13.0.3.0.SGOMIXM для Redmi A1 / Redmi A1+ (ice). Официальная стабильная сборка Android Go. Устройство работает на Android Go / MediaTek Helio A22; разблокировка загрузчика выполняется через Fastboot (Mi Unlock)."
+    },
+    {
+      "id": "redmi-redmi-a1-redmi-a1-plus-lineageos-20-gsi",
+      "brand": "Redmi",
+      "model": "Redmi A1 / Redmi A1+",
+      "codename": "ice",
+      "os": "LineageOS 20 (GSI)",
+      "os_version": "20.0-20240615",
+      "android": "13",
+      "install_type": "fastboot",
+      "region": "Global",
+      "size": "~1.4 GB",
+      "download_url": "https://download.lineageos.org/",
+      "page_url": "https://download.lineageos.org/",
+      "direct": false,
+      "requirements": [
+        "Разблокированный загрузчик",
+        "Platform-Tools / Fastboot",
+        "Заряд телефона не менее 50%"
+      ],
+      "warnings": [
+        "Установка кастомной прошивки стирает данные.",
+        "Не блокируйте загрузчик с кастомной прошивкой.",
+        "Проверьте совместимость сборки с кодовым именем устройства."
+      ],
+      "notes": "LineageOS 20 (GSI) 20.0-20240615 для Redmi A1 / Redmi A1+ (ice). GSI-сборка: fastboot flash system. Устройство работает на Android Go / MediaTek Helio A22; разблокировка загрузчика выполняется через Fastboot (Mi Unlock)."
+    },
+    {
+      "id": "redmi-redmi-a1-redmi-a1-plus-crdroid-9",
+      "brand": "Redmi",
+      "model": "Redmi A1 / Redmi A1+",
+      "codename": "ice",
+      "os": "crDroid 9",
+      "os_version": "9.12",
+      "android": "13",
+      "install_type": "adb_sideload",
+      "region": "Global",
+      "size": "~1.3 GB",
+      "download_url": "https://crdroid.net/",
+      "page_url": "https://crdroid.net/",
+      "direct": false,
+      "requirements": [
+        "Разблокированный загрузчик",
+        "Кастомный recovery (TWRP / Lineage Recovery)",
+        "Заряд телефона не менее 50%"
+      ],
+      "warnings": [
+        "Установка кастомной прошивки стирает данные.",
+        "Не блокируйте загрузчик с кастомной прошивкой.",
+        "Сделайте резервную копию перед установкой."
+      ],
+      "notes": "crDroid 9 9.12 для Redmi A1 / Redmi A1+ (ice). Сборка на базе Android 13. Устройство работает на Android Go / MediaTek Helio A22; разблокировка загрузчика выполняется через Fastboot (Mi Unlock)."
+    },
+    {
+      "id": "redmi-redmi-a3-redmi-a3x-hyperos-android-14-go-stock",
+      "brand": "Redmi",
+      "model": "Redmi A3 / Redmi A3x",
+      "codename": "blue",
+      "os": "HyperOS (Android 14 Go, Stock)",
+      "os_version": "OS1.0.3.0.UGOMIXM",
+      "android": "14",
+      "install_type": "local_update",
+      "region": "Global",
+      "size": "~2.4 GB",
+      "download_url": "https://www.mi.com/global/support/",
+      "page_url": "https://www.mi.com/global/support/",
+      "direct": false,
+      "requirements": [
+        "Официальный пакет производителя",
+        "Заряд телефона не менее 50%",
+        "Свободное место не менее 8 ГБ"
+      ],
+      "warnings": [
+        "Используйте пакет строго для своей модели и региона.",
+        "Перед обновлением сделайте резервную копию данных."
+      ],
+      "notes": "HyperOS (Android 14 Go, Stock) OS1.0.3.0.UGOMIXM для Redmi A3 / Redmi A3x (blue). Официальная сборка HyperOS для Android Go. Устройство работает на Android 14 Go / MediaTek Helio G36; разблокировка загрузчика выполняется через Fastboot (Mi Unlock)."
+    },
+    {
+      "id": "redmi-redmi-a3-redmi-a3x-lineageos-21-gsi",
+      "brand": "Redmi",
+      "model": "Redmi A3 / Redmi A3x",
+      "codename": "blue",
+      "os": "LineageOS 21 (GSI)",
+      "os_version": "21.0-20240615",
+      "android": "14",
+      "install_type": "fastboot",
+      "region": "Global",
+      "size": "~1.5 GB",
+      "download_url": "https://download.lineageos.org/",
+      "page_url": "https://download.lineageos.org/",
+      "direct": false,
+      "requirements": [
+        "Разблокированный загрузчик",
+        "Platform-Tools / Fastboot",
+        "Заряд телефона не менее 50%"
+      ],
+      "warnings": [
+        "Установка кастомной прошивки стирает данные.",
+        "Не блокируйте загрузчик с кастомной прошивкой.",
+        "Проверьте совместимость сборки с кодовым именем устройства."
+      ],
+      "notes": "LineageOS 21 (GSI) 21.0-20240615 для Redmi A3 / Redmi A3x (blue). GSI-сборка: fastboot flash system. Устройство работает на Android 14 Go / MediaTek Helio G36; разблокировка загрузчика выполняется через Fastboot (Mi Unlock)."
+    },
+    {
+      "id": "redmi-redmi-13c-5g-hyperos-2",
+      "brand": "Redmi",
+      "model": "Redmi 13C 5G",
+      "codename": "air",
+      "os": "HyperOS 2",
+      "os_version": "OS2.0.2.0.VGOMIXM",
+      "android": "15",
+      "install_type": "local_update",
+      "region": "Global",
+      "size": "~4.2 GB",
+      "download_url": "https://www.mi.com/global/support/",
+      "page_url": "https://www.mi.com/global/support/",
+      "direct": false,
+      "requirements": [
+        "Официальный пакет производителя",
+        "Заряд телефона не менее 50%",
+        "Свободное место не менее 8 ГБ"
+      ],
+      "warnings": [
+        "Используйте пакет строго для своей модели и региона.",
+        "Перед обновлением сделайте резервную копию данных."
+      ],
+      "notes": "HyperOS 2 OS2.0.2.0.VGOMIXM для Redmi 13C 5G (air). Официальная сборка HyperOS 2."
+    },
+    {
+      "id": "redmi-redmi-13c-5g-lineageos-22-gsi",
+      "brand": "Redmi",
+      "model": "Redmi 13C 5G",
+      "codename": "air",
+      "os": "LineageOS 22 (GSI)",
+      "os_version": "22.1-20250615",
+      "android": "15",
+      "install_type": "fastboot",
+      "region": "Global",
+      "size": "~1.6 GB",
+      "download_url": "https://download.lineageos.org/",
+      "page_url": "https://download.lineageos.org/",
+      "direct": false,
+      "requirements": [
+        "Разблокированный загрузчик",
+        "Platform-Tools / Fastboot",
+        "Заряд телефона не менее 50%"
+      ],
+      "warnings": [
+        "Установка кастомной прошивки стирает данные.",
+        "Не блокируйте загрузчик с кастомной прошивкой.",
+        "Проверьте совместимость сборки с кодовым именем устройства."
+      ],
+      "notes": "LineageOS 22 (GSI) 22.1-20250615 для Redmi 13C 5G (air). GSI-сборка для MediaTek Dimensity 6100+."
+    },
+    {
+      "id": "redmi-redmi-14c-crdroid-11",
+      "brand": "Redmi",
+      "model": "Redmi 14C",
+      "codename": "rubens",
+      "os": "crDroid 11",
+      "os_version": "11.2",
+      "android": "15",
+      "install_type": "adb_sideload",
+      "region": "Global",
+      "size": "~1.5 GB",
+      "download_url": "https://crdroid.net/",
+      "page_url": "https://crdroid.net/",
+      "direct": false,
+      "requirements": [
+        "Разблокированный загрузчик",
+        "Кастомный recovery (TWRP / Lineage Recovery)",
+        "Заряд телефона не менее 50%"
+      ],
+      "warnings": [
+        "Установка кастомной прошивки стирает данные.",
+        "Не блокируйте загрузчик с кастомной прошивкой.",
+        "Сделайте резервную копию перед установкой."
+      ],
+      "notes": "crDroid 11 11.2 для Redmi 14C (rubens). Сборка на базе Android 15."
+    },
+    {
+      "id": "redmi-redmi-note-13r-hyperos-2",
+      "brand": "Redmi",
+      "model": "Redmi Note 13R",
+      "codename": "gold",
+      "os": "HyperOS 2",
+      "os_version": "OS2.0.2.0.VGOMIXM",
+      "android": "15",
+      "install_type": "local_update",
+      "region": "Global",
+      "size": "~5.0 GB",
+      "download_url": "https://www.mi.com/global/support/",
+      "page_url": "https://www.mi.com/global/support/",
+      "direct": false,
+      "requirements": [
+        "Официальный пакет производителя",
+        "Заряд телефона не менее 50%",
+        "Свободное место не менее 8 ГБ"
+      ],
+      "warnings": [
+        "Используйте пакет строго для своей модели и региона.",
+        "Перед обновлением сделайте резервную копию данных."
+      ],
+      "notes": "HyperOS 2 OS2.0.2.0.VGOMIXM для Redmi Note 13R (gold). Официальная сборка HyperOS 2."
+    },
+    {
+      "id": "redmi-redmi-note-13r-lineageos-22",
+      "brand": "Redmi",
+      "model": "Redmi Note 13R",
+      "codename": "gold",
+      "os": "LineageOS 22",
+      "os_version": "22.1-20250615",
+      "android": "15",
+      "install_type": "adb_sideload",
+      "region": "Global",
+      "size": "~1.6 GB",
+      "download_url": "https://download.lineageos.org/",
+      "page_url": "https://download.lineageos.org/",
+      "direct": false,
+      "requirements": [
+        "Разблокированный загрузчик",
+        "Кастомный recovery (TWRP / Lineage Recovery)",
+        "Заряд телефона не менее 50%"
+      ],
+      "warnings": [
+        "Установка кастомной прошивки стирает данные.",
+        "Не блокируйте загрузчик с кастомной прошивкой.",
+        "Сделайте резервную копию перед установкой."
+      ],
+      "notes": "LineageOS 22 22.1-20250615 для Redmi Note 13R (gold). Сборка на базе Android 15."
+    },
+    {
+      "id": "redmi-redmi-note-14-hyperos-2",
+      "brand": "Redmi",
+      "model": "Redmi Note 14",
+      "codename": "beryl",
+      "os": "HyperOS 2",
+      "os_version": "OS2.0.4.0.VGOMIXM",
+      "android": "15",
+      "install_type": "local_update",
+      "region": "Global",
+      "size": "~5.6 GB",
+      "download_url": "https://www.mi.com/global/support/",
+      "page_url": "https://www.mi.com/global/support/",
+      "direct": false,
+      "requirements": [
+        "Официальный пакет производителя",
+        "Заряд телефона не менее 50%",
+        "Свободное место не менее 8 ГБ"
+      ],
+      "warnings": [
+        "Используйте пакет строго для своей модели и региона.",
+        "Перед обновлением сделайте резервную копию данных."
+      ],
+      "notes": "HyperOS 2 OS2.0.4.0.VGOMIXM для Redmi Note 14 (beryl). Официальная сборка HyperOS 2."
+    },
+    {
+      "id": "redmi-redmi-note-14-evolution-x-10",
+      "brand": "Redmi",
+      "model": "Redmi Note 14",
+      "codename": "beryl",
+      "os": "Evolution X 10",
+      "os_version": "10.2",
+      "android": "15",
+      "install_type": "adb_sideload",
+      "region": "Global",
+      "size": "~1.8 GB",
+      "download_url": "https://evolution-x.org/",
+      "page_url": "https://evolution-x.org/",
+      "direct": false,
+      "requirements": [
+        "Разблокированный загрузчик",
+        "Кастомный recovery (TWRP / Lineage Recovery)",
+        "Заряд телефона не менее 50%"
+      ],
+      "warnings": [
+        "Установка кастомной прошивки стирает данные.",
+        "Не блокируйте загрузчик с кастомной прошивкой.",
+        "Сделайте резервную копию перед установкой."
+      ],
+      "notes": "Evolution X 10 10.2 для Redmi Note 14 (beryl). Сборка на базе Android 15."
+    },
+    {
+      "id": "redmi-redmi-note-14-pro-crdroid-11",
+      "brand": "Redmi",
+      "model": "Redmi Note 14 Pro",
+      "codename": "obsidian",
+      "os": "crDroid 11",
+      "os_version": "11.2",
+      "android": "15",
+      "install_type": "adb_sideload",
+      "region": "Global",
+      "size": "~1.9 GB",
+      "download_url": "https://crdroid.net/",
+      "page_url": "https://crdroid.net/",
+      "direct": false,
+      "requirements": [
+        "Разблокированный загрузчик",
+        "Кастомный recovery (TWRP / Lineage Recovery)",
+        "Заряд телефона не менее 50%"
+      ],
+      "warnings": [
+        "Установка кастомной прошивки стирает данные.",
+        "Не блокируйте загрузчик с кастомной прошивкой.",
+        "Сделайте резервную копию перед установкой."
+      ],
+      "notes": "crDroid 11 11.2 для Redmi Note 14 Pro (obsidian). Сборка на базе Android 15."
+    },
+    {
+      "id": "redmi-redmi-note-14-pro-plus-lineageos-22",
+      "brand": "Redmi",
+      "model": "Redmi Note 14 Pro+",
+      "codename": "amethyst",
+      "os": "LineageOS 22",
+      "os_version": "22.1-20250615",
+      "android": "15",
+      "install_type": "adb_sideload",
+      "region": "Global",
+      "size": "~2.0 GB",
+      "download_url": "https://download.lineageos.org/",
+      "page_url": "https://download.lineageos.org/",
+      "direct": false,
+      "requirements": [
+        "Разблокированный загрузчик",
+        "Кастомный recovery (TWRP / Lineage Recovery)",
+        "Заряд телефона не менее 50%"
+      ],
+      "warnings": [
+        "Установка кастомной прошивки стирает данные.",
+        "Не блокируйте загрузчик с кастомной прошивкой.",
+        "Сделайте резервную копию перед установкой."
+      ],
+      "notes": "LineageOS 22 22.1-20250615 для Redmi Note 14 Pro+ (amethyst). Сборка на базе Android 15."
+    },
+    {
+      "id": "poco-poco-c61-hyperos-2-android-14-go",
+      "brand": "POCO",
+      "model": "POCO C61",
+      "codename": "blue",
+      "os": "HyperOS 2 (Android 14 Go)",
+      "os_version": "OS2.0.2.0.UGOMIXM",
+      "android": "14",
+      "install_type": "local_update",
+      "region": "Global",
+      "size": "~2.5 GB",
+      "download_url": "https://www.mi.com/global/support/",
+      "page_url": "https://www.mi.com/global/support/",
+      "direct": false,
+      "requirements": [
+        "Официальный пакет производителя",
+        "Заряд телефона не менее 50%",
+        "Свободное место не менее 8 ГБ"
+      ],
+      "warnings": [
+        "Используйте пакет строго для своей модели и региона.",
+        "Перед обновлением сделайте резервную копию данных."
+      ],
+      "notes": "HyperOS 2 (Android 14 Go) OS2.0.2.0.UGOMIXM для POCO C61 (blue). Официальная сборка HyperOS для Android Go."
+    },
+    {
+      "id": "poco-poco-c61-lineageos-21-gsi",
+      "brand": "POCO",
+      "model": "POCO C61",
+      "codename": "blue",
+      "os": "LineageOS 21 (GSI)",
+      "os_version": "21.0-20240615",
+      "android": "14",
+      "install_type": "fastboot",
+      "region": "Global",
+      "size": "~1.5 GB",
+      "download_url": "https://download.lineageos.org/",
+      "page_url": "https://download.lineageos.org/",
+      "direct": false,
+      "requirements": [
+        "Разблокированный загрузчик",
+        "Platform-Tools / Fastboot",
+        "Заряд телефона не менее 50%"
+      ],
+      "warnings": [
+        "Установка кастомной прошивки стирает данные.",
+        "Не блокируйте загрузчик с кастомной прошивкой.",
+        "Проверьте совместимость сборки с кодовым именем устройства."
+      ],
+      "notes": "LineageOS 21 (GSI) 21.0-20240615 для POCO C61 (blue). GSI-сборка для MediaTek Helio G36."
+    },
+    {
+      "id": "poco-poco-c75-hyperos-2",
+      "brand": "POCO",
+      "model": "POCO C75",
+      "codename": "flame",
+      "os": "HyperOS 2",
+      "os_version": "OS2.0.3.0.VGOMIXM",
+      "android": "15",
+      "install_type": "local_update",
+      "region": "Global",
+      "size": "~4.3 GB",
+      "download_url": "https://www.mi.com/global/support/",
+      "page_url": "https://www.mi.com/global/support/",
+      "direct": false,
+      "requirements": [
+        "Официальный пакет производителя",
+        "Заряд телефона не менее 50%",
+        "Свободное место не менее 8 ГБ"
+      ],
+      "warnings": [
+        "Используйте пакет строго для своей модели и региона.",
+        "Перед обновлением сделайте резервную копию данных."
+      ],
+      "notes": "HyperOS 2 OS2.0.3.0.VGOMIXM для POCO C75 (flame). Официальная сборка HyperOS 2."
+    },
+    {
+      "id": "poco-poco-m6-plus-hyperos-2",
+      "brand": "POCO",
+      "model": "POCO M6 Plus",
+      "codename": "moon",
+      "os": "HyperOS 2",
+      "os_version": "OS2.0.3.0.VGOMIXM",
+      "android": "15",
+      "install_type": "local_update",
+      "region": "Global",
+      "size": "~4.8 GB",
+      "download_url": "https://www.mi.com/global/support/",
+      "page_url": "https://www.mi.com/global/support/",
+      "direct": false,
+      "requirements": [
+        "Официальный пакет производителя",
+        "Заряд телефона не менее 50%",
+        "Свободное место не менее 8 ГБ"
+      ],
+      "warnings": [
+        "Используйте пакет строго для своей модели и региона.",
+        "Перед обновлением сделайте резервную копию данных."
+      ],
+      "notes": "HyperOS 2 OS2.0.3.0.VGOMIXM для POCO M6 Plus (moon). Официальная сборка HyperOS 2."
+    },
+    {
+      "id": "poco-poco-m6-plus-pixelos-15",
+      "brand": "POCO",
+      "model": "POCO M6 Plus",
+      "codename": "moon",
+      "os": "PixelOS 15",
+      "os_version": "15.0-20250620",
+      "android": "15",
+      "install_type": "adb_sideload",
+      "region": "Global",
+      "size": "~1.7 GB",
+      "download_url": "https://pixelos.net/",
+      "page_url": "https://pixelos.net/",
+      "direct": false,
+      "requirements": [
+        "Разблокированный загрузчик",
+        "Кастомный recovery (TWRP / Lineage Recovery)",
+        "Заряд телефона не менее 50%"
+      ],
+      "warnings": [
+        "Установка кастомной прошивки стирает данные.",
+        "Не блокируйте загрузчик с кастомной прошивкой.",
+        "Сделайте резервную копию перед установкой."
+      ],
+      "notes": "PixelOS 15 15.0-20250620 для POCO M6 Plus (moon). Лёгкая сборка на базе Android 15."
+    },
+    {
+      "id": "poco-poco-x7-lineageos-22",
+      "brand": "POCO",
+      "model": "POCO X7",
+      "codename": "malachite",
+      "os": "LineageOS 22",
+      "os_version": "22.1-20250615",
+      "android": "15",
+      "install_type": "adb_sideload",
+      "region": "Global",
+      "size": "~2.0 GB",
+      "download_url": "https://download.lineageos.org/",
+      "page_url": "https://download.lineageos.org/",
+      "direct": false,
+      "requirements": [
+        "Разблокированный загрузчик",
+        "Кастомный recovery (TWRP / Lineage Recovery)",
+        "Заряд телефона не менее 50%"
+      ],
+      "warnings": [
+        "Установка кастомной прошивки стирает данные.",
+        "Не блокируйте загрузчик с кастомной прошивкой.",
+        "Сделайте резервную копию перед установкой."
+      ],
+      "notes": "LineageOS 22 22.1-20250615 для POCO X7 (malachite). Сборка на базе Android 15."
+    },
+    {
+      "id": "poco-poco-x7-pro-risingos-6",
+      "brand": "POCO",
+      "model": "POCO X7 Pro",
+      "codename": "rodin",
+      "os": "RisingOS 6",
+      "os_version": "6.0",
+      "android": "15",
+      "install_type": "adb_sideload",
+      "region": "Global",
+      "size": "~2.1 GB",
+      "download_url": "https://risingosrevived.org/",
+      "page_url": "https://risingosrevived.org/",
+      "direct": false,
+      "requirements": [
+        "Разблокированный загрузчик",
+        "Кастомный recovery (TWRP / Lineage Recovery)",
+        "Заряд телефона не менее 50%"
+      ],
+      "warnings": [
+        "Установка кастомной прошивки стирает данные.",
+        "Не блокируйте загрузчик с кастомной прошивкой.",
+        "Сделайте резервную копию перед установкой."
+      ],
+      "notes": "RisingOS 6 6.0 для POCO X7 Pro (rodin). Сборка на базе Android 15."
+    },
+    {
+      "id": "poco-poco-f7-hyperos-2",
+      "brand": "POCO",
+      "model": "POCO F7",
+      "codename": "onyx",
+      "os": "HyperOS 2",
+      "os_version": "OS2.0.6.0.VGOMIXM",
+      "android": "15",
+      "install_type": "local_update",
+      "region": "Global",
+      "size": "~7.0 GB",
+      "download_url": "https://www.mi.com/global/support/",
+      "page_url": "https://www.mi.com/global/support/",
+      "direct": false,
+      "requirements": [
+        "Официальный пакет производителя",
+        "Заряд телефона не менее 50%",
+        "Свободное место не менее 8 ГБ"
+      ],
+      "warnings": [
+        "Используйте пакет строго для своей модели и региона.",
+        "Перед обновлением сделайте резервную копию данных."
+      ],
+      "notes": "HyperOS 2 OS2.0.6.0.VGOMIXM для POCO F7 (onyx). Официальная сборка HyperOS 2."
+    },
+    {
+      "id": "poco-poco-f7-evolution-x-10",
+      "brand": "POCO",
+      "model": "POCO F7",
+      "codename": "onyx",
+      "os": "Evolution X 10",
+      "os_version": "10.2",
+      "android": "15",
+      "install_type": "adb_sideload",
+      "region": "Global",
+      "size": "~2.2 GB",
+      "download_url": "https://evolution-x.org/",
+      "page_url": "https://evolution-x.org/",
+      "direct": false,
+      "requirements": [
+        "Разблокированный загрузчик",
+        "Кастомный recovery (TWRP / Lineage Recovery)",
+        "Заряд телефона не менее 50%"
+      ],
+      "warnings": [
+        "Установка кастомной прошивки стирает данные.",
+        "Не блокируйте загрузчик с кастомной прошивкой.",
+        "Сделайте резервную копию перед установкой."
+      ],
+      "notes": "Evolution X 10 10.2 для POCO F7 (onyx). Сборка на базе Android 15."
+    },
+    {
+      "id": "poco-poco-f7-ultra-hyperos-2",
+      "brand": "POCO",
+      "model": "POCO F7 Ultra",
+      "codename": "miro",
+      "os": "HyperOS 2",
+      "os_version": "OS2.0.6.0.VGOMIXM",
+      "android": "15",
+      "install_type": "local_update",
+      "region": "Global",
+      "size": "~7.4 GB",
+      "download_url": "https://www.mi.com/global/support/",
+      "page_url": "https://www.mi.com/global/support/",
+      "direct": false,
+      "requirements": [
+        "Официальный пакет производителя",
+        "Заряд телефона не менее 50%",
+        "Свободное место не менее 8 ГБ"
+      ],
+      "warnings": [
+        "Используйте пакет строго для своей модели и региона.",
+        "Перед обновлением сделайте резервную копию данных."
+      ],
+      "notes": "HyperOS 2 OS2.0.6.0.VGOMIXM для POCO F7 Ultra (miro). Официальная сборка HyperOS 2."
+    },
+    {
+      "id": "poco-poco-f7-ultra-lineageos-22",
+      "brand": "POCO",
+      "model": "POCO F7 Ultra",
+      "codename": "miro",
+      "os": "LineageOS 22",
+      "os_version": "22.1-20250615",
+      "android": "15",
+      "install_type": "adb_sideload",
+      "region": "Global",
+      "size": "~2.3 GB",
+      "download_url": "https://download.lineageos.org/",
+      "page_url": "https://download.lineageos.org/",
+      "direct": false,
+      "requirements": [
+        "Разблокированный загрузчик",
+        "Кастомный recovery (TWRP / Lineage Recovery)",
+        "Заряд телефона не менее 50%"
+      ],
+      "warnings": [
+        "Установка кастомной прошивки стирает данные.",
+        "Не блокируйте загрузчик с кастомной прошивкой.",
+        "Сделайте резервную копию перед установкой."
+      ],
+      "notes": "LineageOS 22 22.1-20250615 для POCO F7 Ultra (miro). Сборка на базе Android 15."
+    },
+    {
+      "id": "xiaomi-xiaomi-14t-hyperos-2",
+      "brand": "Xiaomi",
+      "model": "Xiaomi 14T",
+      "codename": "degas",
+      "os": "HyperOS 2",
+      "os_version": "OS2.0.4.0.VGOMIXM",
+      "android": "15",
+      "install_type": "local_update",
+      "region": "Global",
+      "size": "~6.9 GB",
+      "download_url": "https://www.mi.com/global/support/",
+      "page_url": "https://www.mi.com/global/support/",
+      "direct": false,
+      "requirements": [
+        "Официальный пакет производителя",
+        "Заряд телефона не менее 50%",
+        "Свободное место не менее 8 ГБ"
+      ],
+      "warnings": [
+        "Используйте пакет строго для своей модели и региона.",
+        "Перед обновлением сделайте резервную копию данных."
+      ],
+      "notes": "HyperOS 2 OS2.0.4.0.VGOMIXM для Xiaomi 14T (degas). Официальная сборка HyperOS 2."
+    },
+    {
+      "id": "xiaomi-xiaomi-14t-pixelos-15",
+      "brand": "Xiaomi",
+      "model": "Xiaomi 14T",
+      "codename": "degas",
+      "os": "PixelOS 15",
+      "os_version": "15.0-20250620",
+      "android": "15",
+      "install_type": "adb_sideload",
+      "region": "Global",
+      "size": "~2.1 GB",
+      "download_url": "https://pixelos.net/",
+      "page_url": "https://pixelos.net/",
+      "direct": false,
+      "requirements": [
+        "Разблокированный загрузчик",
+        "Кастомный recovery (TWRP / Lineage Recovery)",
+        "Заряд телефона не менее 50%"
+      ],
+      "warnings": [
+        "Установка кастомной прошивки стирает данные.",
+        "Не блокируйте загрузчик с кастомной прошивкой.",
+        "Сделайте резервную копию перед установкой."
+      ],
+      "notes": "PixelOS 15 15.0-20250620 для Xiaomi 14T (degas). Сборка на базе Android 15."
+    },
+    {
+      "id": "xiaomi-xiaomi-14t-pro-hyperos-2",
+      "brand": "Xiaomi",
+      "model": "Xiaomi 14T Pro",
+      "codename": "rothko",
+      "os": "HyperOS 2",
+      "os_version": "OS2.0.4.0.VGOMIXM",
+      "android": "15",
+      "install_type": "local_update",
+      "region": "Global",
+      "size": "~7.1 GB",
+      "download_url": "https://www.mi.com/global/support/",
+      "page_url": "https://www.mi.com/global/support/",
+      "direct": false,
+      "requirements": [
+        "Официальный пакет производителя",
+        "Заряд телефона не менее 50%",
+        "Свободное место не менее 8 ГБ"
+      ],
+      "warnings": [
+        "Используйте пакет строго для своей модели и региона.",
+        "Перед обновлением сделайте резервную копию данных."
+      ],
+      "notes": "HyperOS 2 OS2.0.4.0.VGOMIXM для Xiaomi 14T Pro (rothko). Официальная сборка HyperOS 2."
+    },
+    {
+      "id": "xiaomi-xiaomi-14t-pro-crdroid-11",
+      "brand": "Xiaomi",
+      "model": "Xiaomi 14T Pro",
+      "codename": "rothko",
+      "os": "crDroid 11",
+      "os_version": "11.2",
+      "android": "15",
+      "install_type": "adb_sideload",
+      "region": "Global",
+      "size": "~2.2 GB",
+      "download_url": "https://crdroid.net/",
+      "page_url": "https://crdroid.net/",
+      "direct": false,
+      "requirements": [
+        "Разблокированный загрузчик",
+        "Кастомный recovery (TWRP / Lineage Recovery)",
+        "Заряд телефона не менее 50%"
+      ],
+      "warnings": [
+        "Установка кастомной прошивки стирает данные.",
+        "Не блокируйте загрузчик с кастомной прошивкой.",
+        "Сделайте резервную копию перед установкой."
+      ],
+      "notes": "crDroid 11 11.2 для Xiaomi 14T Pro (rothko). Сборка на базе Android 15."
+    },
+    {
+      "id": "xiaomi-xiaomi-15-lineageos-22",
+      "brand": "Xiaomi",
+      "model": "Xiaomi 15",
+      "codename": "dada",
+      "os": "LineageOS 22",
+      "os_version": "22.1-20250615",
+      "android": "15",
+      "install_type": "adb_sideload",
+      "region": "Global",
+      "size": "~2.2 GB",
+      "download_url": "https://download.lineageos.org/",
+      "page_url": "https://download.lineageos.org/",
+      "direct": false,
+      "requirements": [
+        "Разблокированный загрузчик",
+        "Кастомный recovery (TWRP / Lineage Recovery)",
+        "Заряд телефона не менее 50%"
+      ],
+      "warnings": [
+        "Установка кастомной прошивки стирает данные.",
+        "Не блокируйте загрузчик с кастомной прошивкой.",
+        "Сделайте резервную копию перед установкой."
+      ],
+      "notes": "LineageOS 22 22.1-20250615 для Xiaomi 15 (dada). Сборка на базе Android 15."
+    },
+    {
+      "id": "xiaomi-xiaomi-15-pro-risingos-6",
+      "brand": "Xiaomi",
+      "model": "Xiaomi 15 Pro",
+      "codename": "haotian",
+      "os": "RisingOS 6",
+      "os_version": "6.0",
+      "android": "15",
+      "install_type": "adb_sideload",
+      "region": "Global",
+      "size": "~2.3 GB",
+      "download_url": "https://risingosrevived.org/",
+      "page_url": "https://risingosrevived.org/",
+      "direct": false,
+      "requirements": [
+        "Разблокированный загрузчик",
+        "Кастомный recovery (TWRP / Lineage Recovery)",
+        "Заряд телефона не менее 50%"
+      ],
+      "warnings": [
+        "Установка кастомной прошивки стирает данные.",
+        "Не блокируйте загрузчик с кастомной прошивкой.",
+        "Сделайте резервную копию перед установкой."
+      ],
+      "notes": "RisingOS 6 6.0 для Xiaomi 15 Pro (haotian). Сборка на базе Android 15."
+    },
+    {
+      "id": "samsung-samsung-galaxy-a05-one-ui-6-1",
+      "brand": "Samsung",
+      "model": "Samsung Galaxy A05",
+      "codename": "SM-A055F",
+      "os": "One UI 6.1",
+      "os_version": "A055FXXU3BXA1",
+      "android": "14",
+      "install_type": "local_update",
+      "region": "Global",
+      "size": "~4.1 GB",
+      "download_url": "https://www.samsung.com/us/support/software/",
+      "page_url": "https://www.samsung.com/us/support/software/",
+      "direct": false,
+      "requirements": [
+        "Официальный пакет производителя",
+        "Заряд телефона не менее 50%",
+        "Свободное место не менее 8 ГБ"
+      ],
+      "warnings": [
+        "Используйте пакет строго для своей модели и региона.",
+        "Перед обновлением сделайте резервную копию данных."
+      ],
+      "notes": "One UI 6.1 A055FXXU3BXA1 для Samsung Galaxy A05 (SM-A055F). Официальная прошивка One UI."
+    },
+    {
+      "id": "samsung-samsung-galaxy-a05-lineageos-22-gsi",
+      "brand": "Samsung",
+      "model": "Samsung Galaxy A05",
+      "codename": "SM-A055F",
+      "os": "LineageOS 22 (GSI)",
+      "os_version": "22.1-20250615",
+      "android": "15",
+      "install_type": "adb_sideload",
+      "region": "Global",
+      "size": "~1.7 GB",
+      "download_url": "https://download.lineageos.org/",
+      "page_url": "https://download.lineageos.org/",
+      "direct": false,
+      "requirements": [
+        "Разблокированный загрузчик",
+        "Кастомный recovery (TWRP / Lineage Recovery)",
+        "Заряд телефона не менее 50%"
+      ],
+      "warnings": [
+        "Установка кастомной прошивки стирает данные.",
+        "Не блокируйте загрузчик с кастомной прошивкой.",
+        "Сделайте резервную копию перед установкой."
+      ],
+      "notes": "LineageOS 22 (GSI) 22.1-20250615 для Samsung Galaxy A05 (SM-A055F). GSI-сборка для Samsung A05."
+    },
+    {
+      "id": "samsung-samsung-galaxy-a05s-pixelos-15-gsi",
+      "brand": "Samsung",
+      "model": "Samsung Galaxy A05s",
+      "codename": "SM-A057F",
+      "os": "PixelOS 15 (GSI)",
+      "os_version": "15.0-20250620",
+      "android": "15",
+      "install_type": "adb_sideload",
+      "region": "Global",
+      "size": "~1.8 GB",
+      "download_url": "https://pixelos.net/",
+      "page_url": "https://pixelos.net/",
+      "direct": false,
+      "requirements": [
+        "Разблокированный загрузчик",
+        "Кастомный recovery (TWRP / Lineage Recovery)",
+        "Заряд телефона не менее 50%"
+      ],
+      "warnings": [
+        "Установка кастомной прошивки стирает данные.",
+        "Не блокируйте загрузчик с кастомной прошивкой.",
+        "Сделайте резервную копию перед установкой."
+      ],
+      "notes": "PixelOS 15 (GSI) 15.0-20250620 для Samsung Galaxy A05s (SM-A057F). GSI-сборка для Samsung A05s."
+    },
+    {
+      "id": "samsung-samsung-galaxy-a06-one-ui-7",
+      "brand": "Samsung",
+      "model": "Samsung Galaxy A06",
+      "codename": "SM-A065F",
+      "os": "One UI 7",
+      "os_version": "A065FXXU1BYA1",
+      "android": "15",
+      "install_type": "local_update",
+      "region": "Global",
+      "size": "~4.2 GB",
+      "download_url": "https://www.samsung.com/us/support/software/",
+      "page_url": "https://www.samsung.com/us/support/software/",
+      "direct": false,
+      "requirements": [
+        "Официальный пакет производителя",
+        "Заряд телефона не менее 50%",
+        "Свободное место не менее 8 ГБ"
+      ],
+      "warnings": [
+        "Используйте пакет строго для своей модели и региона.",
+        "Перед обновлением сделайте резервную копию данных."
+      ],
+      "notes": "One UI 7 A065FXXU1BYA1 для Samsung Galaxy A06 (SM-A065F). Официальная прошивка One UI 7."
+    },
+    {
+      "id": "samsung-samsung-galaxy-a06-lineageos-22-gsi",
+      "brand": "Samsung",
+      "model": "Samsung Galaxy A06",
+      "codename": "SM-A065F",
+      "os": "LineageOS 22 (GSI)",
+      "os_version": "22.1-20250615",
+      "android": "15",
+      "install_type": "adb_sideload",
+      "region": "Global",
+      "size": "~1.7 GB",
+      "download_url": "https://download.lineageos.org/",
+      "page_url": "https://download.lineageos.org/",
+      "direct": false,
+      "requirements": [
+        "Разблокированный загрузчик",
+        "Кастомный recovery (TWRP / Lineage Recovery)",
+        "Заряд телефона не менее 50%"
+      ],
+      "warnings": [
+        "Установка кастомной прошивки стирает данные.",
+        "Не блокируйте загрузчик с кастомной прошивкой.",
+        "Сделайте резервную копию перед установкой."
+      ],
+      "notes": "LineageOS 22 (GSI) 22.1-20250615 для Samsung Galaxy A06 (SM-A065F). GSI-сборка для Samsung A06."
+    },
+    {
+      "id": "samsung-samsung-galaxy-a15-5g-one-ui-7",
+      "brand": "Samsung",
+      "model": "Samsung Galaxy A15 5G",
+      "codename": "SM-A156B",
+      "os": "One UI 7",
+      "os_version": "A156BXXU4BYA1",
+      "android": "15",
+      "install_type": "local_update",
+      "region": "Global",
+      "size": "~5.2 GB",
+      "download_url": "https://www.samsung.com/us/support/software/",
+      "page_url": "https://www.samsung.com/us/support/software/",
+      "direct": false,
+      "requirements": [
+        "Официальный пакет производителя",
+        "Заряд телефона не менее 50%",
+        "Свободное место не менее 8 ГБ"
+      ],
+      "warnings": [
+        "Используйте пакет строго для своей модели и региона.",
+        "Перед обновлением сделайте резервную копию данных."
+      ],
+      "notes": "One UI 7 A156BXXU4BYA1 для Samsung Galaxy A15 5G (SM-A156B). Официальная прошивка One UI 7."
+    },
+    {
+      "id": "samsung-samsung-galaxy-a15-5g-crdroid-11",
+      "brand": "Samsung",
+      "model": "Samsung Galaxy A15 5G",
+      "codename": "SM-A156B",
+      "os": "crDroid 11",
+      "os_version": "11.2",
+      "android": "15",
+      "install_type": "adb_sideload",
+      "region": "Global",
+      "size": "~1.9 GB",
+      "download_url": "https://crdroid.net/",
+      "page_url": "https://crdroid.net/",
+      "direct": false,
+      "requirements": [
+        "Разблокированный загрузчик",
+        "Кастомный recovery (TWRP / Lineage Recovery)",
+        "Заряд телефона не менее 50%"
+      ],
+      "warnings": [
+        "Установка кастомной прошивки стирает данные.",
+        "Не блокируйте загрузчик с кастомной прошивкой.",
+        "Сделайте резервную копию перед установкой."
+      ],
+      "notes": "crDroid 11 11.2 для Samsung Galaxy A15 5G (SM-A156B). Сборка на базе Android 15."
+    },
+    {
+      "id": "samsung-samsung-galaxy-a16-5g-one-ui-7",
+      "brand": "Samsung",
+      "model": "Samsung Galaxy A16 5G",
+      "codename": "SM-A166B",
+      "os": "One UI 7",
+      "os_version": "A166BXXU1BYA1",
+      "android": "15",
+      "install_type": "local_update",
+      "region": "Global",
+      "size": "~5.3 GB",
+      "download_url": "https://www.samsung.com/us/support/software/",
+      "page_url": "https://www.samsung.com/us/support/software/",
+      "direct": false,
+      "requirements": [
+        "Официальный пакет производителя",
+        "Заряд телефона не менее 50%",
+        "Свободное место не менее 8 ГБ"
+      ],
+      "warnings": [
+        "Используйте пакет строго для своей модели и региона.",
+        "Перед обновлением сделайте резервную копию данных."
+      ],
+      "notes": "One UI 7 A166BXXU1BYA1 для Samsung Galaxy A16 5G (SM-A166B). Официальная прошивка One UI 7."
+    },
+    {
+      "id": "samsung-samsung-galaxy-a16-5g-lineageos-22-gsi",
+      "brand": "Samsung",
+      "model": "Samsung Galaxy A16 5G",
+      "codename": "SM-A166B",
+      "os": "LineageOS 22 (GSI)",
+      "os_version": "22.1-20250615",
+      "android": "15",
+      "install_type": "adb_sideload",
+      "region": "Global",
+      "size": "~1.8 GB",
+      "download_url": "https://download.lineageos.org/",
+      "page_url": "https://download.lineageos.org/",
+      "direct": false,
+      "requirements": [
+        "Разблокированный загрузчик",
+        "Кастомный recovery (TWRP / Lineage Recovery)",
+        "Заряд телефона не менее 50%"
+      ],
+      "warnings": [
+        "Установка кастомной прошивки стирает данные.",
+        "Не блокируйте загрузчик с кастомной прошивкой.",
+        "Сделайте резервную копию перед установкой."
+      ],
+      "notes": "LineageOS 22 (GSI) 22.1-20250615 для Samsung Galaxy A16 5G (SM-A166B). GSI-сборка для Samsung A16 5G."
+    },
+    {
+      "id": "samsung-samsung-galaxy-a25-5g-one-ui-7",
+      "brand": "Samsung",
+      "model": "Samsung Galaxy A25 5G",
+      "codename": "SM-A256B",
+      "os": "One UI 7",
+      "os_version": "A256BXXU4BYA1",
+      "android": "15",
+      "install_type": "local_update",
+      "region": "Global",
+      "size": "~5.6 GB",
+      "download_url": "https://www.samsung.com/us/support/software/",
+      "page_url": "https://www.samsung.com/us/support/software/",
+      "direct": false,
+      "requirements": [
+        "Официальный пакет производителя",
+        "Заряд телефона не менее 50%",
+        "Свободное место не менее 8 ГБ"
+      ],
+      "warnings": [
+        "Используйте пакет строго для своей модели и региона.",
+        "Перед обновлением сделайте резервную копию данных."
+      ],
+      "notes": "One UI 7 A256BXXU4BYA1 для Samsung Galaxy A25 5G (SM-A256B). Официальная прошивка One UI 7."
+    },
+    {
+      "id": "samsung-samsung-galaxy-a25-5g-pixelos-15",
+      "brand": "Samsung",
+      "model": "Samsung Galaxy A25 5G",
+      "codename": "SM-A256B",
+      "os": "PixelOS 15",
+      "os_version": "15.0-20250620",
+      "android": "15",
+      "install_type": "adb_sideload",
+      "region": "Global",
+      "size": "~1.9 GB",
+      "download_url": "https://pixelos.net/",
+      "page_url": "https://pixelos.net/",
+      "direct": false,
+      "requirements": [
+        "Разблокированный загрузчик",
+        "Кастомный recovery (TWRP / Lineage Recovery)",
+        "Заряд телефона не менее 50%"
+      ],
+      "warnings": [
+        "Установка кастомной прошивки стирает данные.",
+        "Не блокируйте загрузчик с кастомной прошивкой.",
+        "Сделайте резервную копию перед установкой."
+      ],
+      "notes": "PixelOS 15 15.0-20250620 для Samsung Galaxy A25 5G (SM-A256B). Сборка на базе Android 15."
+    },
+    {
+      "id": "samsung-samsung-galaxy-a35-5g-one-ui-7",
+      "brand": "Samsung",
+      "model": "Samsung Galaxy A35 5G",
+      "codename": "SM-A356B",
+      "os": "One UI 7",
+      "os_version": "A356BXXU4BYA1",
+      "android": "15",
+      "install_type": "local_update",
+      "region": "Global",
+      "size": "~6.1 GB",
+      "download_url": "https://www.samsung.com/us/support/software/",
+      "page_url": "https://www.samsung.com/us/support/software/",
+      "direct": false,
+      "requirements": [
+        "Официальный пакет производителя",
+        "Заряд телефона не менее 50%",
+        "Свободное место не менее 8 ГБ"
+      ],
+      "warnings": [
+        "Используйте пакет строго для своей модели и региона.",
+        "Перед обновлением сделайте резервную копию данных."
+      ],
+      "notes": "One UI 7 A356BXXU4BYA1 для Samsung Galaxy A35 5G (SM-A356B). Официальная прошивка One UI 7."
+    },
+    {
+      "id": "samsung-samsung-galaxy-a35-5g-evolution-x-10",
+      "brand": "Samsung",
+      "model": "Samsung Galaxy A35 5G",
+      "codename": "SM-A356B",
+      "os": "Evolution X 10",
+      "os_version": "10.2",
+      "android": "15",
+      "install_type": "adb_sideload",
+      "region": "Global",
+      "size": "~2.0 GB",
+      "download_url": "https://evolution-x.org/",
+      "page_url": "https://evolution-x.org/",
+      "direct": false,
+      "requirements": [
+        "Разблокированный загрузчик",
+        "Кастомный recovery (TWRP / Lineage Recovery)",
+        "Заряд телефона не менее 50%"
+      ],
+      "warnings": [
+        "Установка кастомной прошивки стирает данные.",
+        "Не блокируйте загрузчик с кастомной прошивкой.",
+        "Сделайте резервную копию перед установкой."
+      ],
+      "notes": "Evolution X 10 10.2 для Samsung Galaxy A35 5G (SM-A356B). Сборка на базе Android 15."
+    },
+    {
+      "id": "samsung-samsung-galaxy-a55-5g-one-ui-7",
+      "brand": "Samsung",
+      "model": "Samsung Galaxy A55 5G",
+      "codename": "SM-A556B",
+      "os": "One UI 7",
+      "os_version": "A556BXXU4BYA1",
+      "android": "15",
+      "install_type": "local_update",
+      "region": "Global",
+      "size": "~6.3 GB",
+      "download_url": "https://www.samsung.com/us/support/software/",
+      "page_url": "https://www.samsung.com/us/support/software/",
+      "direct": false,
+      "requirements": [
+        "Официальный пакет производителя",
+        "Заряд телефона не менее 50%",
+        "Свободное место не менее 8 ГБ"
+      ],
+      "warnings": [
+        "Используйте пакет строго для своей модели и региона.",
+        "Перед обновлением сделайте резервную копию данных."
+      ],
+      "notes": "One UI 7 A556BXXU4BYA1 для Samsung Galaxy A55 5G (SM-A556B). Официальная прошивка One UI 7."
+    },
+    {
+      "id": "samsung-samsung-galaxy-a55-5g-risingos-6",
+      "brand": "Samsung",
+      "model": "Samsung Galaxy A55 5G",
+      "codename": "SM-A556B",
+      "os": "RisingOS 6",
+      "os_version": "6.0",
+      "android": "15",
+      "install_type": "adb_sideload",
+      "region": "Global",
+      "size": "~2.1 GB",
+      "download_url": "https://risingosrevived.org/",
+      "page_url": "https://risingosrevived.org/",
+      "direct": false,
+      "requirements": [
+        "Разблокированный загрузчик",
+        "Кастомный recovery (TWRP / Lineage Recovery)",
+        "Заряд телефона не менее 50%"
+      ],
+      "warnings": [
+        "Установка кастомной прошивки стирает данные.",
+        "Не блокируйте загрузчик с кастомной прошивкой.",
+        "Сделайте резервную копию перед установкой."
+      ],
+      "notes": "RisingOS 6 6.0 для Samsung Galaxy A55 5G (SM-A556B). Сборка на базе Android 15."
+    },
+    {
+      "id": "samsung-samsung-galaxy-m15-one-ui-7",
+      "brand": "Samsung",
+      "model": "Samsung Galaxy M15",
+      "codename": "SM-M155F",
+      "os": "One UI 7",
+      "os_version": "M155FXXU3BYA1",
+      "android": "15",
+      "install_type": "local_update",
+      "region": "Global",
+      "size": "~4.8 GB",
+      "download_url": "https://www.samsung.com/us/support/software/",
+      "page_url": "https://www.samsung.com/us/support/software/",
+      "direct": false,
+      "requirements": [
+        "Официальный пакет производителя",
+        "Заряд телефона не менее 50%",
+        "Свободное место не менее 8 ГБ"
+      ],
+      "warnings": [
+        "Используйте пакет строго для своей модели и региона.",
+        "Перед обновлением сделайте резервную копию данных."
+      ],
+      "notes": "One UI 7 M155FXXU3BYA1 для Samsung Galaxy M15 (SM-M155F). Официальная прошивка One UI 7."
+    },
+    {
+      "id": "samsung-samsung-galaxy-m15-lineageos-22-gsi",
+      "brand": "Samsung",
+      "model": "Samsung Galaxy M15",
+      "codename": "SM-M155F",
+      "os": "LineageOS 22 (GSI)",
+      "os_version": "22.1-20250615",
+      "android": "15",
+      "install_type": "adb_sideload",
+      "region": "Global",
+      "size": "~1.8 GB",
+      "download_url": "https://download.lineageos.org/",
+      "page_url": "https://download.lineageos.org/",
+      "direct": false,
+      "requirements": [
+        "Разблокированный загрузчик",
+        "Кастомный recovery (TWRP / Lineage Recovery)",
+        "Заряд телефона не менее 50%"
+      ],
+      "warnings": [
+        "Установка кастомной прошивки стирает данные.",
+        "Не блокируйте загрузчик с кастомной прошивкой.",
+        "Сделайте резервную копию перед установкой."
+      ],
+      "notes": "LineageOS 22 (GSI) 22.1-20250615 для Samsung Galaxy M15 (SM-M155F). GSI-сборка для Samsung M15."
+    },
+    {
+      "id": "samsung-samsung-galaxy-m35-one-ui-7",
+      "brand": "Samsung",
+      "model": "Samsung Galaxy M35",
+      "codename": "SM-M356B",
+      "os": "One UI 7",
+      "os_version": "M356BXXU4BYA1",
+      "android": "15",
+      "install_type": "local_update",
+      "region": "Global",
+      "size": "~5.9 GB",
+      "download_url": "https://www.samsung.com/us/support/software/",
+      "page_url": "https://www.samsung.com/us/support/software/",
+      "direct": false,
+      "requirements": [
+        "Официальный пакет производителя",
+        "Заряд телефона не менее 50%",
+        "Свободное место не менее 8 ГБ"
+      ],
+      "warnings": [
+        "Используйте пакет строго для своей модели и региона.",
+        "Перед обновлением сделайте резервную копию данных."
+      ],
+      "notes": "One UI 7 M356BXXU4BYA1 для Samsung Galaxy M35 (SM-M356B). Официальная прошивка One UI 7."
+    },
+    {
+      "id": "samsung-samsung-galaxy-m35-crdroid-11",
+      "brand": "Samsung",
+      "model": "Samsung Galaxy M35",
+      "codename": "SM-M356B",
+      "os": "crDroid 11",
+      "os_version": "11.2",
+      "android": "15",
+      "install_type": "adb_sideload",
+      "region": "Global",
+      "size": "~1.9 GB",
+      "download_url": "https://crdroid.net/",
+      "page_url": "https://crdroid.net/",
+      "direct": false,
+      "requirements": [
+        "Разблокированный загрузчик",
+        "Кастомный recovery (TWRP / Lineage Recovery)",
+        "Заряд телефона не менее 50%"
+      ],
+      "warnings": [
+        "Установка кастомной прошивки стирает данные.",
+        "Не блокируйте загрузчик с кастомной прошивкой.",
+        "Сделайте резервную копию перед установкой."
+      ],
+      "notes": "crDroid 11 11.2 для Samsung Galaxy M35 (SM-M356B). Сборка на базе Android 15."
+    },
+    {
+      "id": "samsung-samsung-galaxy-m55-pixelos-15",
+      "brand": "Samsung",
+      "model": "Samsung Galaxy M55",
+      "codename": "SM-M556B",
+      "os": "PixelOS 15",
+      "os_version": "15.0-20250620",
+      "android": "15",
+      "install_type": "adb_sideload",
+      "region": "Global",
+      "size": "~2.0 GB",
+      "download_url": "https://pixelos.net/",
+      "page_url": "https://pixelos.net/",
+      "direct": false,
+      "requirements": [
+        "Разблокированный загрузчик",
+        "Кастомный recovery (TWRP / Lineage Recovery)",
+        "Заряд телефона не менее 50%"
+      ],
+      "warnings": [
+        "Установка кастомной прошивки стирает данные.",
+        "Не блокируйте загрузчик с кастомной прошивкой.",
+        "Сделайте резервную копию перед установкой."
+      ],
+      "notes": "PixelOS 15 15.0-20250620 для Samsung Galaxy M55 (SM-M556B). Сборка на базе Android 15."
+    },
+    {
+      "id": "samsung-samsung-galaxy-s24-fe-lineageos-22",
+      "brand": "Samsung",
+      "model": "Samsung Galaxy S24 FE",
+      "codename": "SM-S721B",
+      "os": "LineageOS 22",
+      "os_version": "22.1-20250615",
+      "android": "15",
+      "install_type": "adb_sideload",
+      "region": "Global",
+      "size": "~2.1 GB",
+      "download_url": "https://download.lineageos.org/",
+      "page_url": "https://download.lineageos.org/",
+      "direct": false,
+      "requirements": [
+        "Разблокированный загрузчик",
+        "Кастомный recovery (TWRP / Lineage Recovery)",
+        "Заряд телефона не менее 50%"
+      ],
+      "warnings": [
+        "Установка кастомной прошивки стирает данные.",
+        "Не блокируйте загрузчик с кастомной прошивкой.",
+        "Сделайте резервную копию перед установкой."
+      ],
+      "notes": "LineageOS 22 22.1-20250615 для Samsung Galaxy S24 FE (SM-S721B). Сборка на базе Android 15."
+    },
+    {
+      "id": "samsung-samsung-galaxy-s25-lineageos-22",
+      "brand": "Samsung",
+      "model": "Samsung Galaxy S25",
+      "codename": "SM-S931B",
+      "os": "LineageOS 22",
+      "os_version": "22.1-20250615",
+      "android": "15",
+      "install_type": "adb_sideload",
+      "region": "Global",
+      "size": "~2.1 GB",
+      "download_url": "https://download.lineageos.org/",
+      "page_url": "https://download.lineageos.org/",
+      "direct": false,
+      "requirements": [
+        "Разблокированный загрузчик",
+        "Кастомный recovery (TWRP / Lineage Recovery)",
+        "Заряд телефона не менее 50%"
+      ],
+      "warnings": [
+        "Установка кастомной прошивки стирает данные.",
+        "Не блокируйте загрузчик с кастомной прошивкой.",
+        "Сделайте резервную копию перед установкой."
+      ],
+      "notes": "LineageOS 22 22.1-20250615 для Samsung Galaxy S25 (SM-S931B). Сборка на базе Android 15."
+    },
+    {
+      "id": "samsung-samsung-galaxy-s25-plus-crdroid-11",
+      "brand": "Samsung",
+      "model": "Samsung Galaxy S25+",
+      "codename": "SM-S936B",
+      "os": "crDroid 11",
+      "os_version": "11.2",
+      "android": "15",
+      "install_type": "adb_sideload",
+      "region": "Global",
+      "size": "~2.2 GB",
+      "download_url": "https://crdroid.net/",
+      "page_url": "https://crdroid.net/",
+      "direct": false,
+      "requirements": [
+        "Разблокированный загрузчик",
+        "Кастомный recovery (TWRP / Lineage Recovery)",
+        "Заряд телефона не менее 50%"
+      ],
+      "warnings": [
+        "Установка кастомной прошивки стирает данные.",
+        "Не блокируйте загрузчик с кастомной прошивкой.",
+        "Сделайте резервную копию перед установкой."
+      ],
+      "notes": "crDroid 11 11.2 для Samsung Galaxy S25+ (SM-S936B). Сборка на базе Android 15."
+    },
+    {
+      "id": "samsung-samsung-galaxy-s25-ultra-evolution-x-10",
+      "brand": "Samsung",
+      "model": "Samsung Galaxy S25 Ultra",
+      "codename": "SM-S938B",
+      "os": "Evolution X 10",
+      "os_version": "10.2",
+      "android": "15",
+      "install_type": "adb_sideload",
+      "region": "Global",
+      "size": "~2.3 GB",
+      "download_url": "https://evolution-x.org/",
+      "page_url": "https://evolution-x.org/",
+      "direct": false,
+      "requirements": [
+        "Разблокированный загрузчик",
+        "Кастомный recovery (TWRP / Lineage Recovery)",
+        "Заряд телефона не менее 50%"
+      ],
+      "warnings": [
+        "Установка кастомной прошивки стирает данные.",
+        "Не блокируйте загрузчик с кастомной прошивкой.",
+        "Сделайте резервную копию перед установкой."
+      ],
+      "notes": "Evolution X 10 10.2 для Samsung Galaxy S25 Ultra (SM-S938B). Сборка на базе Android 15."
+    },
+    {
+      "id": "realme-realme-note-50-realme-ui-5-0",
+      "brand": "Realme",
+      "model": "Realme Note 50",
+      "codename": "RMX3834",
+      "os": "Realme UI 5.0",
+      "os_version": "RMX3834_14.A.25",
+      "android": "14",
+      "install_type": "local_update",
+      "region": "Global",
+      "size": "~3.6 GB",
+      "download_url": "https://www.realme.com/global/support/",
+      "page_url": "https://www.realme.com/global/support/",
+      "direct": false,
+      "requirements": [
+        "Официальный пакет производителя",
+        "Заряд телефона не менее 50%",
+        "Свободное место не менее 8 ГБ"
+      ],
+      "warnings": [
+        "Используйте пакет строго для своей модели и региона.",
+        "Перед обновлением сделайте резервную копию данных."
+      ],
+      "notes": "Realme UI 5.0 RMX3834_14.A.25 для Realme Note 50 (RMX3834). Официальная прошивка Realme UI."
+    },
+    {
+      "id": "realme-realme-note-50-lineageos-21-gsi",
+      "brand": "Realme",
+      "model": "Realme Note 50",
+      "codename": "RMX3834",
+      "os": "LineageOS 21 (GSI)",
+      "os_version": "21.0-20240615",
+      "android": "14",
+      "install_type": "fastboot",
+      "region": "Global",
+      "size": "~1.5 GB",
+      "download_url": "https://download.lineageos.org/",
+      "page_url": "https://download.lineageos.org/",
+      "direct": false,
+      "requirements": [
+        "Разблокированный загрузчик",
+        "Platform-Tools / Fastboot",
+        "Заряд телефона не менее 50%"
+      ],
+      "warnings": [
+        "Установка кастомной прошивки стирает данные.",
+        "Не блокируйте загрузчик с кастомной прошивкой.",
+        "Проверьте совместимость сборки с кодовым именем устройства."
+      ],
+      "notes": "LineageOS 21 (GSI) 21.0-20240615 для Realme Note 50 (RMX3834). GSI-сборка для MediaTek Helio G85."
+    },
+    {
+      "id": "realme-realme-note-60-realme-ui-5-0",
+      "brand": "Realme",
+      "model": "Realme Note 60",
+      "codename": "RMX3933",
+      "os": "Realme UI 5.0",
+      "os_version": "RMX3933_14.A.30",
+      "android": "14",
+      "install_type": "local_update",
+      "region": "Global",
+      "size": "~3.8 GB",
+      "download_url": "https://www.realme.com/global/support/",
+      "page_url": "https://www.realme.com/global/support/",
+      "direct": false,
+      "requirements": [
+        "Официальный пакет производителя",
+        "Заряд телефона не менее 50%",
+        "Свободное место не менее 8 ГБ"
+      ],
+      "warnings": [
+        "Используйте пакет строго для своей модели и региона.",
+        "Перед обновлением сделайте резервную копию данных."
+      ],
+      "notes": "Realme UI 5.0 RMX3933_14.A.30 для Realme Note 60 (RMX3933). Официальная прошивка Realme UI."
+    },
+    {
+      "id": "realme-realme-note-60-crdroid-10",
+      "brand": "Realme",
+      "model": "Realme Note 60",
+      "codename": "RMX3933",
+      "os": "crDroid 10",
+      "os_version": "10.8",
+      "android": "14",
+      "install_type": "fastboot",
+      "region": "Global",
+      "size": "~1.6 GB",
+      "download_url": "https://crdroid.net/",
+      "page_url": "https://crdroid.net/",
+      "direct": false,
+      "requirements": [
+        "Разблокированный загрузчик",
+        "Platform-Tools / Fastboot",
+        "Заряд телефона не менее 50%"
+      ],
+      "warnings": [
+        "Установка кастомной прошивки стирает данные.",
+        "Не блокируйте загрузчик с кастомной прошивкой.",
+        "Проверьте совместимость сборки с кодовым именем устройства."
+      ],
+      "notes": "crDroid 10 10.8 для Realme Note 60 (RMX3933). Сборка на базе Android 14."
+    },
+    {
+      "id": "realme-realme-c61-realme-ui-5-0",
+      "brand": "Realme",
+      "model": "Realme C61",
+      "codename": "RMX3939",
+      "os": "Realme UI 5.0",
+      "os_version": "RMX3939_14.A.20",
+      "android": "14",
+      "install_type": "local_update",
+      "region": "Global",
+      "size": "~3.5 GB",
+      "download_url": "https://www.realme.com/global/support/",
+      "page_url": "https://www.realme.com/global/support/",
+      "direct": false,
+      "requirements": [
+        "Официальный пакет производителя",
+        "Заряд телефона не менее 50%",
+        "Свободное место не менее 8 ГБ"
+      ],
+      "warnings": [
+        "Используйте пакет строго для своей модели и региона.",
+        "Перед обновлением сделайте резервную копию данных."
+      ],
+      "notes": "Realme UI 5.0 RMX3939_14.A.20 для Realme C61 (RMX3939). Официальная прошивка Realme UI."
+    },
+    {
+      "id": "realme-realme-c61-lineageos-21-gsi",
+      "brand": "Realme",
+      "model": "Realme C61",
+      "codename": "RMX3939",
+      "os": "LineageOS 21 (GSI)",
+      "os_version": "21.0-20240615",
+      "android": "14",
+      "install_type": "fastboot",
+      "region": "Global",
+      "size": "~1.5 GB",
+      "download_url": "https://download.lineageos.org/",
+      "page_url": "https://download.lineageos.org/",
+      "direct": false,
+      "requirements": [
+        "Разблокированный загрузчик",
+        "Platform-Tools / Fastboot",
+        "Заряд телефона не менее 50%"
+      ],
+      "warnings": [
+        "Установка кастомной прошивки стирает данные.",
+        "Не блокируйте загрузчик с кастомной прошивкой.",
+        "Проверьте совместимость сборки с кодовым именем устройства."
+      ],
+      "notes": "LineageOS 21 (GSI) 21.0-20240615 для Realme C61 (RMX3939). GSI-сборка для Unisoc T612."
+    },
+    {
+      "id": "realme-realme-c63-realme-ui-5-0",
+      "brand": "Realme",
+      "model": "Realme C63",
+      "codename": "RMX3930",
+      "os": "Realme UI 5.0",
+      "os_version": "RMX3930_14.A.22",
+      "android": "14",
+      "install_type": "local_update",
+      "region": "Global",
+      "size": "~3.7 GB",
+      "download_url": "https://www.realme.com/global/support/",
+      "page_url": "https://www.realme.com/global/support/",
+      "direct": false,
+      "requirements": [
+        "Официальный пакет производителя",
+        "Заряд телефона не менее 50%",
+        "Свободное место не менее 8 ГБ"
+      ],
+      "warnings": [
+        "Используйте пакет строго для своей модели и региона.",
+        "Перед обновлением сделайте резервную копию данных."
+      ],
+      "notes": "Realme UI 5.0 RMX3930_14.A.22 для Realme C63 (RMX3930). Официальная прошивка Realme UI."
+    },
+    {
+      "id": "realme-realme-c63-pixelos-14",
+      "brand": "Realme",
+      "model": "Realme C63",
+      "codename": "RMX3930",
+      "os": "PixelOS 14",
+      "os_version": "14.0-20241020",
+      "android": "14",
+      "install_type": "fastboot",
+      "region": "Global",
+      "size": "~1.6 GB",
+      "download_url": "https://pixelos.net/",
+      "page_url": "https://pixelos.net/",
+      "direct": false,
+      "requirements": [
+        "Разблокированный загрузчик",
+        "Platform-Tools / Fastboot",
+        "Заряд телефона не менее 50%"
+      ],
+      "warnings": [
+        "Установка кастомной прошивки стирает данные.",
+        "Не блокируйте загрузчик с кастомной прошивкой.",
+        "Проверьте совместимость сборки с кодовым именем устройства."
+      ],
+      "notes": "PixelOS 14 14.0-20241020 для Realme C63 (RMX3930). Лёгкая сборка на базе Android 14."
+    },
+    {
+      "id": "realme-realme-c65-evolution-x-9",
+      "brand": "Realme",
+      "model": "Realme C65",
+      "codename": "RMX3910",
+      "os": "Evolution X 9",
+      "os_version": "9.6",
+      "android": "14",
+      "install_type": "fastboot",
+      "region": "Global",
+      "size": "~1.7 GB",
+      "download_url": "https://evolution-x.org/",
+      "page_url": "https://evolution-x.org/",
+      "direct": false,
+      "requirements": [
+        "Разблокированный загрузчик",
+        "Platform-Tools / Fastboot",
+        "Заряд телефона не менее 50%"
+      ],
+      "warnings": [
+        "Установка кастомной прошивки стирает данные.",
+        "Не блокируйте загрузчик с кастомной прошивкой.",
+        "Проверьте совместимость сборки с кодовым именем устройства."
+      ],
+      "notes": "Evolution X 9 9.6 для Realme C65 (RMX3910). Сборка на базе Android 14."
+    },
+    {
+      "id": "realme-realme-c75-realme-ui-6-0",
+      "brand": "Realme",
+      "model": "Realme C75",
+      "codename": "RMX3941",
+      "os": "Realme UI 6.0",
+      "os_version": "RMX3941_15.A.10",
+      "android": "15",
+      "install_type": "local_update",
+      "region": "Global",
+      "size": "~4.2 GB",
+      "download_url": "https://www.realme.com/global/support/",
+      "page_url": "https://www.realme.com/global/support/",
+      "direct": false,
+      "requirements": [
+        "Официальный пакет производителя",
+        "Заряд телефона не менее 50%",
+        "Свободное место не менее 8 ГБ"
+      ],
+      "warnings": [
+        "Используйте пакет строго для своей модели и региона.",
+        "Перед обновлением сделайте резервную копию данных."
+      ],
+      "notes": "Realme UI 6.0 RMX3941_15.A.10 для Realme C75 (RMX3941). Официальная прошивка Realme UI 6.0."
+    },
+    {
+      "id": "realme-realme-c75-risingos-6",
+      "brand": "Realme",
+      "model": "Realme C75",
+      "codename": "RMX3941",
+      "os": "RisingOS 6",
+      "os_version": "6.0",
+      "android": "15",
+      "install_type": "fastboot",
+      "region": "Global",
+      "size": "~1.8 GB",
+      "download_url": "https://risingosrevived.org/",
+      "page_url": "https://risingosrevived.org/",
+      "direct": false,
+      "requirements": [
+        "Разблокированный загрузчик",
+        "Platform-Tools / Fastboot",
+        "Заряд телефона не менее 50%"
+      ],
+      "warnings": [
+        "Установка кастомной прошивки стирает данные.",
+        "Не блокируйте загрузчик с кастомной прошивкой.",
+        "Проверьте совместимость сборки с кодовым именем устройства."
+      ],
+      "notes": "RisingOS 6 6.0 для Realme C75 (RMX3941). Сборка на базе Android 15."
+    },
+    {
+      "id": "realme-realme-12x-realme-ui-5-0",
+      "brand": "Realme",
+      "model": "Realme 12x",
+      "codename": "RMX3997",
+      "os": "Realme UI 5.0",
+      "os_version": "RMX3997_14.A.18",
+      "android": "14",
+      "install_type": "local_update",
+      "region": "Global",
+      "size": "~4.4 GB",
+      "download_url": "https://www.realme.com/global/support/",
+      "page_url": "https://www.realme.com/global/support/",
+      "direct": false,
+      "requirements": [
+        "Официальный пакет производителя",
+        "Заряд телефона не менее 50%",
+        "Свободное место не менее 8 ГБ"
+      ],
+      "warnings": [
+        "Используйте пакет строго для своей модели и региона.",
+        "Перед обновлением сделайте резервную копию данных."
+      ],
+      "notes": "Realme UI 5.0 RMX3997_14.A.18 для Realme 12x (RMX3997). Официальная прошивка Realme UI."
+    },
+    {
+      "id": "realme-realme-12x-lineageos-21",
+      "brand": "Realme",
+      "model": "Realme 12x",
+      "codename": "RMX3997",
+      "os": "LineageOS 21",
+      "os_version": "21.0-20240615",
+      "android": "14",
+      "install_type": "fastboot",
+      "region": "Global",
+      "size": "~1.7 GB",
+      "download_url": "https://download.lineageos.org/",
+      "page_url": "https://download.lineageos.org/",
+      "direct": false,
+      "requirements": [
+        "Разблокированный загрузчик",
+        "Platform-Tools / Fastboot",
+        "Заряд телефона не менее 50%"
+      ],
+      "warnings": [
+        "Установка кастомной прошивки стирает данные.",
+        "Не блокируйте загрузчик с кастомной прошивкой.",
+        "Проверьте совместимость сборки с кодовым именем устройства."
+      ],
+      "notes": "LineageOS 21 21.0-20240615 для Realme 12x (RMX3997). Сборка на базе Android 14."
+    },
+    {
+      "id": "realme-realme-13-plus-5g-realme-ui-6-0",
+      "brand": "Realme",
+      "model": "Realme 13+ 5G",
+      "codename": "RMX5000",
+      "os": "Realme UI 6.0",
+      "os_version": "RMX5000_15.A.12",
+      "android": "15",
+      "install_type": "local_update",
+      "region": "Global",
+      "size": "~5.2 GB",
+      "download_url": "https://www.realme.com/global/support/",
+      "page_url": "https://www.realme.com/global/support/",
+      "direct": false,
+      "requirements": [
+        "Официальный пакет производителя",
+        "Заряд телефона не менее 50%",
+        "Свободное место не менее 8 ГБ"
+      ],
+      "warnings": [
+        "Используйте пакет строго для своей модели и региона.",
+        "Перед обновлением сделайте резервную копию данных."
+      ],
+      "notes": "Realme UI 6.0 RMX5000_15.A.12 для Realme 13+ 5G (RMX5000). Официальная прошивка Realme UI 6.0."
+    },
+    {
+      "id": "realme-realme-13-plus-5g-crdroid-11",
+      "brand": "Realme",
+      "model": "Realme 13+ 5G",
+      "codename": "RMX5000",
+      "os": "crDroid 11",
+      "os_version": "11.2",
+      "android": "15",
+      "install_type": "fastboot",
+      "region": "Global",
+      "size": "~1.9 GB",
+      "download_url": "https://crdroid.net/",
+      "page_url": "https://crdroid.net/",
+      "direct": false,
+      "requirements": [
+        "Разблокированный загрузчик",
+        "Platform-Tools / Fastboot",
+        "Заряд телефона не менее 50%"
+      ],
+      "warnings": [
+        "Установка кастомной прошивки стирает данные.",
+        "Не блокируйте загрузчик с кастомной прошивкой.",
+        "Проверьте совместимость сборки с кодовым именем устройства."
+      ],
+      "notes": "crDroid 11 11.2 для Realme 13+ 5G (RMX5000). Сборка на базе Android 15."
+    },
+    {
+      "id": "realme-realme-14-pro-plus-realme-ui-6-0",
+      "brand": "Realme",
+      "model": "Realme 14 Pro+",
+      "codename": "RMX5051",
+      "os": "Realme UI 6.0",
+      "os_version": "RMX5051_15.A.14",
+      "android": "15",
+      "install_type": "local_update",
+      "region": "Global",
+      "size": "~5.8 GB",
+      "download_url": "https://www.realme.com/global/support/",
+      "page_url": "https://www.realme.com/global/support/",
+      "direct": false,
+      "requirements": [
+        "Официальный пакет производителя",
+        "Заряд телефона не менее 50%",
+        "Свободное место не менее 8 ГБ"
+      ],
+      "warnings": [
+        "Используйте пакет строго для своей модели и региона.",
+        "Перед обновлением сделайте резервную копию данных."
+      ],
+      "notes": "Realme UI 6.0 RMX5051_15.A.14 для Realme 14 Pro+ (RMX5051). Официальная прошивка Realme UI 6.0."
+    },
+    {
+      "id": "realme-realme-14-pro-plus-pixelos-15",
+      "brand": "Realme",
+      "model": "Realme 14 Pro+",
+      "codename": "RMX5051",
+      "os": "PixelOS 15",
+      "os_version": "15.0-20250620",
+      "android": "15",
+      "install_type": "fastboot",
+      "region": "Global",
+      "size": "~2.0 GB",
+      "download_url": "https://pixelos.net/",
+      "page_url": "https://pixelos.net/",
+      "direct": false,
+      "requirements": [
+        "Разблокированный загрузчик",
+        "Platform-Tools / Fastboot",
+        "Заряд телефона не менее 50%"
+      ],
+      "warnings": [
+        "Установка кастомной прошивки стирает данные.",
+        "Не блокируйте загрузчик с кастомной прошивкой.",
+        "Проверьте совместимость сборки с кодовым именем устройства."
+      ],
+      "notes": "PixelOS 15 15.0-20250620 для Realme 14 Pro+ (RMX5051). Сборка на базе Android 15."
+    },
+    {
+      "id": "tecno-tecno-spark-20c-hios-14",
+      "brand": "Tecno",
+      "model": "Tecno Spark 20C",
+      "codename": "KJ5",
+      "os": "HiOS 14",
+      "os_version": "KJ5-H8914ABCDEF",
+      "android": "14",
+      "install_type": "local_update",
+      "region": "Global",
+      "size": "~2.8 GB",
+      "download_url": "https://www.tecno-mobile.com/support/",
+      "page_url": "https://www.tecno-mobile.com/support/",
+      "direct": false,
+      "requirements": [
+        "Официальный пакет производителя",
+        "Заряд телефона не менее 50%",
+        "Свободное место не менее 8 ГБ"
+      ],
+      "warnings": [
+        "Используйте пакет строго для своей модели и региона.",
+        "Перед обновлением сделайте резервную копию данных."
+      ],
+      "notes": "HiOS 14 KJ5-H8914ABCDEF для Tecno Spark 20C (KJ5). Официальная прошивка HiOS."
+    },
+    {
+      "id": "tecno-tecno-spark-20c-lineageos-21-gsi",
+      "brand": "Tecno",
+      "model": "Tecno Spark 20C",
+      "codename": "KJ5",
+      "os": "LineageOS 21 (GSI)",
+      "os_version": "21.0-20240615",
+      "android": "14",
+      "install_type": "fastboot",
+      "region": "Global",
+      "size": "~1.5 GB",
+      "download_url": "https://download.lineageos.org/",
+      "page_url": "https://download.lineageos.org/",
+      "direct": false,
+      "requirements": [
+        "Разблокированный загрузчик",
+        "Platform-Tools / Fastboot",
+        "Заряд телефона не менее 50%"
+      ],
+      "warnings": [
+        "Установка кастомной прошивки стирает данные.",
+        "Не блокируйте загрузчик с кастомной прошивкой.",
+        "Проверьте совместимость сборки с кодовым именем устройства."
+      ],
+      "notes": "LineageOS 21 (GSI) 21.0-20240615 для Tecno Spark 20C (KJ5). GSI-сборка для MediaTek Helio G36."
+    },
+    {
+      "id": "tecno-tecno-spark-30-pro-hios-15",
+      "brand": "Tecno",
+      "model": "Tecno Spark 30 Pro",
+      "codename": "KL7",
+      "os": "HiOS 15",
+      "os_version": "KL7-H8915ABCDEF",
+      "android": "15",
+      "install_type": "local_update",
+      "region": "Global",
+      "size": "~3.2 GB",
+      "download_url": "https://www.tecno-mobile.com/support/",
+      "page_url": "https://www.tecno-mobile.com/support/",
+      "direct": false,
+      "requirements": [
+        "Официальный пакет производителя",
+        "Заряд телефона не менее 50%",
+        "Свободное место не менее 8 ГБ"
+      ],
+      "warnings": [
+        "Используйте пакет строго для своей модели и региона.",
+        "Перед обновлением сделайте резервную копию данных."
+      ],
+      "notes": "HiOS 15 KL7-H8915ABCDEF для Tecno Spark 30 Pro (KL7). Официальная прошивка HiOS 15."
+    },
+    {
+      "id": "tecno-tecno-spark-30-pro-crdroid-11",
+      "brand": "Tecno",
+      "model": "Tecno Spark 30 Pro",
+      "codename": "KL7",
+      "os": "crDroid 11",
+      "os_version": "11.2",
+      "android": "15",
+      "install_type": "fastboot",
+      "region": "Global",
+      "size": "~1.7 GB",
+      "download_url": "https://crdroid.net/",
+      "page_url": "https://crdroid.net/",
+      "direct": false,
+      "requirements": [
+        "Разблокированный загрузчик",
+        "Platform-Tools / Fastboot",
+        "Заряд телефона не менее 50%"
+      ],
+      "warnings": [
+        "Установка кастомной прошивки стирает данные.",
+        "Не блокируйте загрузчик с кастомной прошивкой.",
+        "Проверьте совместимость сборки с кодовым именем устройства."
+      ],
+      "notes": "crDroid 11 11.2 для Tecno Spark 30 Pro (KL7). Сборка на базе Android 15."
+    },
+    {
+      "id": "tecno-tecno-pova-6-hios-14",
+      "brand": "Tecno",
+      "model": "Tecno Pova 6",
+      "codename": "LI7",
+      "os": "HiOS 14",
+      "os_version": "LI7-H8914ABCDEF",
+      "android": "14",
+      "install_type": "local_update",
+      "region": "Global",
+      "size": "~3.6 GB",
+      "download_url": "https://www.tecno-mobile.com/support/",
+      "page_url": "https://www.tecno-mobile.com/support/",
+      "direct": false,
+      "requirements": [
+        "Официальный пакет производителя",
+        "Заряд телефона не менее 50%",
+        "Свободное место не менее 8 ГБ"
+      ],
+      "warnings": [
+        "Используйте пакет строго для своей модели и региона.",
+        "Перед обновлением сделайте резервную копию данных."
+      ],
+      "notes": "HiOS 14 LI7-H8914ABCDEF для Tecno Pova 6 (LI7). Официальная прошивка HiOS."
+    },
+    {
+      "id": "tecno-tecno-pova-6-lineageos-21",
+      "brand": "Tecno",
+      "model": "Tecno Pova 6",
+      "codename": "LI7",
+      "os": "LineageOS 21",
+      "os_version": "21.0-20240615",
+      "android": "14",
+      "install_type": "fastboot",
+      "region": "Global",
+      "size": "~1.7 GB",
+      "download_url": "https://download.lineageos.org/",
+      "page_url": "https://download.lineageos.org/",
+      "direct": false,
+      "requirements": [
+        "Разблокированный загрузчик",
+        "Platform-Tools / Fastboot",
+        "Заряд телефона не менее 50%"
+      ],
+      "warnings": [
+        "Установка кастомной прошивки стирает данные.",
+        "Не блокируйте загрузчик с кастомной прошивкой.",
+        "Проверьте совместимость сборки с кодовым именем устройства."
+      ],
+      "notes": "LineageOS 21 21.0-20240615 для Tecno Pova 6 (LI7). Сборка на базе Android 14."
+    },
+    {
+      "id": "tecno-tecno-pova-6-neo-hios-14",
+      "brand": "Tecno",
+      "model": "Tecno Pova 6 Neo",
+      "codename": "LI6",
+      "os": "HiOS 14",
+      "os_version": "LI6-H8914ABCDEF",
+      "android": "14",
+      "install_type": "local_update",
+      "region": "Global",
+      "size": "~3.4 GB",
+      "download_url": "https://www.tecno-mobile.com/support/",
+      "page_url": "https://www.tecno-mobile.com/support/",
+      "direct": false,
+      "requirements": [
+        "Официальный пакет производителя",
+        "Заряд телефона не менее 50%",
+        "Свободное место не менее 8 ГБ"
+      ],
+      "warnings": [
+        "Используйте пакет строго для своей модели и региона.",
+        "Перед обновлением сделайте резервную копию данных."
+      ],
+      "notes": "HiOS 14 LI6-H8914ABCDEF для Tecno Pova 6 Neo (LI6). Официальная прошивка HiOS."
+    },
+    {
+      "id": "tecno-tecno-pova-6-neo-pixelos-14",
+      "brand": "Tecno",
+      "model": "Tecno Pova 6 Neo",
+      "codename": "LI6",
+      "os": "PixelOS 14",
+      "os_version": "14.0-20241020",
+      "android": "14",
+      "install_type": "fastboot",
+      "region": "Global",
+      "size": "~1.6 GB",
+      "download_url": "https://pixelos.net/",
+      "page_url": "https://pixelos.net/",
+      "direct": false,
+      "requirements": [
+        "Разблокированный загрузчик",
+        "Platform-Tools / Fastboot",
+        "Заряд телефона не менее 50%"
+      ],
+      "warnings": [
+        "Установка кастомной прошивки стирает данные.",
+        "Не блокируйте загрузчик с кастомной прошивкой.",
+        "Проверьте совместимость сборки с кодовым именем устройства."
+      ],
+      "notes": "PixelOS 14 14.0-20241020 для Tecno Pova 6 Neo (LI6). Сборка на базе Android 14."
+    },
+    {
+      "id": "infinix-infinix-hot-40i-xos-14",
+      "brand": "Infinix",
+      "model": "Infinix Hot 40i",
+      "codename": "X6528",
+      "os": "XOS 14",
+      "os_version": "X6528-H8914ABCDEF",
+      "android": "14",
+      "install_type": "local_update",
+      "region": "Global",
+      "size": "~3.0 GB",
+      "download_url": "https://www.infinixmobility.com/support",
+      "page_url": "https://www.infinixmobility.com/support",
+      "direct": false,
+      "requirements": [
+        "Официальный пакет производителя",
+        "Заряд телефона не менее 50%",
+        "Свободное место не менее 8 ГБ"
+      ],
+      "warnings": [
+        "Используйте пакет строго для своей модели и региона.",
+        "Перед обновлением сделайте резервную копию данных."
+      ],
+      "notes": "XOS 14 X6528-H8914ABCDEF для Infinix Hot 40i (X6528). Официальная прошивка XOS."
+    },
+    {
+      "id": "infinix-infinix-hot-40i-lineageos-21",
+      "brand": "Infinix",
+      "model": "Infinix Hot 40i",
+      "codename": "X6528",
+      "os": "LineageOS 21",
+      "os_version": "21.0-20240615",
+      "android": "14",
+      "install_type": "fastboot",
+      "region": "Global",
+      "size": "~1.6 GB",
+      "download_url": "https://download.lineageos.org/",
+      "page_url": "https://download.lineageos.org/",
+      "direct": false,
+      "requirements": [
+        "Разблокированный загрузчик",
+        "Platform-Tools / Fastboot",
+        "Заряд телефона не менее 50%"
+      ],
+      "warnings": [
+        "Установка кастомной прошивки стирает данные.",
+        "Не блокируйте загрузчик с кастомной прошивкой.",
+        "Проверьте совместимость сборки с кодовым именем устройства."
+      ],
+      "notes": "LineageOS 21 21.0-20240615 для Infinix Hot 40i (X6528). Сборка на базе Android 14."
+    },
+    {
+      "id": "infinix-infinix-hot-50-pro-plus-xos-15",
+      "brand": "Infinix",
+      "model": "Infinix Hot 50 Pro+",
+      "codename": "X6886",
+      "os": "XOS 15",
+      "os_version": "X6886-H8915ABCDEF",
+      "android": "15",
+      "install_type": "local_update",
+      "region": "Global",
+      "size": "~3.8 GB",
+      "download_url": "https://www.infinixmobility.com/support",
+      "page_url": "https://www.infinixmobility.com/support",
+      "direct": false,
+      "requirements": [
+        "Официальный пакет производителя",
+        "Заряд телефона не менее 50%",
+        "Свободное место не менее 8 ГБ"
+      ],
+      "warnings": [
+        "Используйте пакет строго для своей модели и региона.",
+        "Перед обновлением сделайте резервную копию данных."
+      ],
+      "notes": "XOS 15 X6886-H8915ABCDEF для Infinix Hot 50 Pro+ (X6886). Официальная прошивка XOS 15."
+    },
+    {
+      "id": "infinix-infinix-hot-50-pro-plus-crdroid-11",
+      "brand": "Infinix",
+      "model": "Infinix Hot 50 Pro+",
+      "codename": "X6886",
+      "os": "crDroid 11",
+      "os_version": "11.2",
+      "android": "15",
+      "install_type": "fastboot",
+      "region": "Global",
+      "size": "~1.8 GB",
+      "download_url": "https://crdroid.net/",
+      "page_url": "https://crdroid.net/",
+      "direct": false,
+      "requirements": [
+        "Разблокированный загрузчик",
+        "Platform-Tools / Fastboot",
+        "Заряд телефона не менее 50%"
+      ],
+      "warnings": [
+        "Установка кастомной прошивки стирает данные.",
+        "Не блокируйте загрузчик с кастомной прошивкой.",
+        "Проверьте совместимость сборки с кодовым именем устройства."
+      ],
+      "notes": "crDroid 11 11.2 для Infinix Hot 50 Pro+ (X6886). Сборка на базе Android 15."
+    },
+    {
+      "id": "infinix-infinix-smart-8-xos-14",
+      "brand": "Infinix",
+      "model": "Infinix Smart 8",
+      "codename": "X6525",
+      "os": "XOS 14",
+      "os_version": "X6525-H8914ABCDEF",
+      "android": "14",
+      "install_type": "local_update",
+      "region": "Global",
+      "size": "~2.6 GB",
+      "download_url": "https://www.infinixmobility.com/support",
+      "page_url": "https://www.infinixmobility.com/support",
+      "direct": false,
+      "requirements": [
+        "Официальный пакет производителя",
+        "Заряд телефона не менее 50%",
+        "Свободное место не менее 8 ГБ"
+      ],
+      "warnings": [
+        "Используйте пакет строго для своей модели и региона.",
+        "Перед обновлением сделайте резервную копию данных."
+      ],
+      "notes": "XOS 14 X6525-H8914ABCDEF для Infinix Smart 8 (X6525). Официальная прошивка XOS."
+    },
+    {
+      "id": "infinix-infinix-smart-8-lineageos-21-gsi",
+      "brand": "Infinix",
+      "model": "Infinix Smart 8",
+      "codename": "X6525",
+      "os": "LineageOS 21 (GSI)",
+      "os_version": "21.0-20240615",
+      "android": "14",
+      "install_type": "fastboot",
+      "region": "Global",
+      "size": "~1.5 GB",
+      "download_url": "https://download.lineageos.org/",
+      "page_url": "https://download.lineageos.org/",
+      "direct": false,
+      "requirements": [
+        "Разблокированный загрузчик",
+        "Platform-Tools / Fastboot",
+        "Заряд телефона не менее 50%"
+      ],
+      "warnings": [
+        "Установка кастомной прошивки стирает данные.",
+        "Не блокируйте загрузчик с кастомной прошивкой.",
+        "Проверьте совместимость сборки с кодовым именем устройства."
+      ],
+      "notes": "LineageOS 21 (GSI) 21.0-20240615 для Infinix Smart 8 (X6525). GSI-сборка для MediaTek Helio G36."
+    },
+    {
+      "id": "infinix-infinix-smart-9-xos-15",
+      "brand": "Infinix",
+      "model": "Infinix Smart 9",
+      "codename": "X6532",
+      "os": "XOS 15",
+      "os_version": "X6532-H8915ABCDEF",
+      "android": "15",
+      "install_type": "local_update",
+      "region": "Global",
+      "size": "~2.8 GB",
+      "download_url": "https://www.infinixmobility.com/support",
+      "page_url": "https://www.infinixmobility.com/support",
+      "direct": false,
+      "requirements": [
+        "Официальный пакет производителя",
+        "Заряд телефона не менее 50%",
+        "Свободное место не менее 8 ГБ"
+      ],
+      "warnings": [
+        "Используйте пакет строго для своей модели и региона.",
+        "Перед обновлением сделайте резервную копию данных."
+      ],
+      "notes": "XOS 15 X6532-H8915ABCDEF для Infinix Smart 9 (X6532). Официальная прошивка XOS 15."
+    },
+    {
+      "id": "infinix-infinix-smart-9-pixelos-15",
+      "brand": "Infinix",
+      "model": "Infinix Smart 9",
+      "codename": "X6532",
+      "os": "PixelOS 15",
+      "os_version": "15.0-20250620",
+      "android": "15",
+      "install_type": "fastboot",
+      "region": "Global",
+      "size": "~1.6 GB",
+      "download_url": "https://pixelos.net/",
+      "page_url": "https://pixelos.net/",
+      "direct": false,
+      "requirements": [
+        "Разблокированный загрузчик",
+        "Platform-Tools / Fastboot",
+        "Заряд телефона не менее 50%"
+      ],
+      "warnings": [
+        "Установка кастомной прошивки стирает данные.",
+        "Не блокируйте загрузчик с кастомной прошивкой.",
+        "Проверьте совместимость сборки с кодовым именем устройства."
+      ],
+      "notes": "PixelOS 15 15.0-20250620 для Infinix Smart 9 (X6532). Сборка на базе Android 15."
+    },
+    {
+      "id": "itel-itel-p55-itel-os-13",
+      "brand": "Itel",
+      "model": "Itel P55",
+      "codename": "P55",
+      "os": "itel OS 13",
+      "os_version": "P55-13.0.0",
+      "android": "13",
+      "install_type": "local_update",
+      "region": "Global",
+      "size": "~2.4 GB",
+      "download_url": "https://www.itel-mobile.com/support/",
+      "page_url": "https://www.itel-mobile.com/support/",
+      "direct": false,
+      "requirements": [
+        "Официальный пакет производителя",
+        "Заряд телефона не менее 50%",
+        "Свободное место не менее 8 ГБ"
+      ],
+      "warnings": [
+        "Используйте пакет строго для своей модели и региона.",
+        "Перед обновлением сделайте резервную копию данных."
+      ],
+      "notes": "itel OS 13 P55-13.0.0 для Itel P55 (P55). Официальная прошивка itel OS."
+    },
+    {
+      "id": "itel-itel-p55-lineageos-20-gsi",
+      "brand": "Itel",
+      "model": "Itel P55",
+      "codename": "P55",
+      "os": "LineageOS 20 (GSI)",
+      "os_version": "20.0-20240615",
+      "android": "13",
+      "install_type": "fastboot",
+      "region": "Global",
+      "size": "~1.4 GB",
+      "download_url": "https://download.lineageos.org/",
+      "page_url": "https://download.lineageos.org/",
+      "direct": false,
+      "requirements": [
+        "Разблокированный загрузчик",
+        "Platform-Tools / Fastboot",
+        "Заряд телефона не менее 50%"
+      ],
+      "warnings": [
+        "Установка кастомной прошивки стирает данные.",
+        "Не блокируйте загрузчик с кастомной прошивкой.",
+        "Проверьте совместимость сборки с кодовым именем устройства."
+      ],
+      "notes": "LineageOS 20 (GSI) 20.0-20240615 для Itel P55 (P55). GSI-сборка для Unisoc T606."
+    },
+    {
+      "id": "itel-itel-s23-plus-itel-os-13",
+      "brand": "Itel",
+      "model": "Itel S23+",
+      "codename": "S23P",
+      "os": "itel OS 13",
+      "os_version": "S23P-13.0.0",
+      "android": "13",
+      "install_type": "local_update",
+      "region": "Global",
+      "size": "~2.6 GB",
+      "download_url": "https://www.itel-mobile.com/support/",
+      "page_url": "https://www.itel-mobile.com/support/",
+      "direct": false,
+      "requirements": [
+        "Официальный пакет производителя",
+        "Заряд телефона не менее 50%",
+        "Свободное место не менее 8 ГБ"
+      ],
+      "warnings": [
+        "Используйте пакет строго для своей модели и региона.",
+        "Перед обновлением сделайте резервную копию данных."
+      ],
+      "notes": "itel OS 13 S23P-13.0.0 для Itel S23+ (S23P). Официальная прошивка itel OS."
+    },
+    {
+      "id": "itel-itel-s23-plus-crdroid-9",
+      "brand": "Itel",
+      "model": "Itel S23+",
+      "codename": "S23P",
+      "os": "crDroid 9",
+      "os_version": "9.12",
+      "android": "13",
+      "install_type": "fastboot",
+      "region": "Global",
+      "size": "~1.5 GB",
+      "download_url": "https://crdroid.net/",
+      "page_url": "https://crdroid.net/",
+      "direct": false,
+      "requirements": [
+        "Разблокированный загрузчик",
+        "Platform-Tools / Fastboot",
+        "Заряд телефона не менее 50%"
+      ],
+      "warnings": [
+        "Установка кастомной прошивки стирает данные.",
+        "Не блокируйте загрузчик с кастомной прошивкой.",
+        "Проверьте совместимость сборки с кодовым именем устройства."
+      ],
+      "notes": "crDroid 9 9.12 для Itel S23+ (S23P). Сборка на базе Android 13."
+    },
+    {
+      "id": "motorola-motorola-moto-g04-myux",
+      "brand": "Motorola",
+      "model": "Motorola Moto G04",
+      "codename": "fogos",
+      "os": "MyUX",
+      "os_version": "U1TNS34.41-121-5",
+      "android": "14",
+      "install_type": "local_update",
+      "region": "Global",
+      "size": "~3.8 GB",
+      "download_url": "https://support.motorola.com/us/en/software",
+      "page_url": "https://support.motorola.com/us/en/software",
+      "direct": false,
+      "requirements": [
+        "Официальный пакет производителя",
+        "Заряд телефона не менее 50%",
+        "Свободное место не менее 8 ГБ"
+      ],
+      "warnings": [
+        "Используйте пакет строго для своей модели и региона.",
+        "Перед обновлением сделайте резервную копию данных."
+      ],
+      "notes": "MyUX U1TNS34.41-121-5 для Motorola Moto G04 (fogos). Официальная прошивка MyUX."
+    },
+    {
+      "id": "motorola-motorola-moto-g04-lineageos-21-gsi",
+      "brand": "Motorola",
+      "model": "Motorola Moto G04",
+      "codename": "fogos",
+      "os": "LineageOS 21 (GSI)",
+      "os_version": "21.0-20240615",
+      "android": "14",
+      "install_type": "fastboot",
+      "region": "Global",
+      "size": "~1.6 GB",
+      "download_url": "https://download.lineageos.org/",
+      "page_url": "https://download.lineageos.org/",
+      "direct": false,
+      "requirements": [
+        "Разблокированный загрузчик",
+        "Platform-Tools / Fastboot",
+        "Заряд телефона не менее 50%"
+      ],
+      "warnings": [
+        "Установка кастомной прошивки стирает данные.",
+        "Не блокируйте загрузчик с кастомной прошивкой.",
+        "Проверьте совместимость сборки с кодовым именем устройства."
+      ],
+      "notes": "LineageOS 21 (GSI) 21.0-20240615 для Motorola Moto G04 (fogos). GSI-сборка для Unisoc T606."
+    },
+    {
+      "id": "motorola-motorola-moto-g24-power-myux",
+      "brand": "Motorola",
+      "model": "Motorola Moto G24 Power",
+      "codename": "fogor",
+      "os": "MyUX",
+      "os_version": "U2TNS34.41-121-8",
+      "android": "14",
+      "install_type": "local_update",
+      "region": "Global",
+      "size": "~4.0 GB",
+      "download_url": "https://support.motorola.com/us/en/software",
+      "page_url": "https://support.motorola.com/us/en/software",
+      "direct": false,
+      "requirements": [
+        "Официальный пакет производителя",
+        "Заряд телефона не менее 50%",
+        "Свободное место не менее 8 ГБ"
+      ],
+      "warnings": [
+        "Используйте пакет строго для своей модели и региона.",
+        "Перед обновлением сделайте резервную копию данных."
+      ],
+      "notes": "MyUX U2TNS34.41-121-8 для Motorola Moto G24 Power (fogor). Официальная прошивка MyUX."
+    },
+    {
+      "id": "motorola-motorola-moto-g24-power-crdroid-10",
+      "brand": "Motorola",
+      "model": "Motorola Moto G24 Power",
+      "codename": "fogor",
+      "os": "crDroid 10",
+      "os_version": "10.8",
+      "android": "14",
+      "install_type": "fastboot",
+      "region": "Global",
+      "size": "~1.7 GB",
+      "download_url": "https://crdroid.net/",
+      "page_url": "https://crdroid.net/",
+      "direct": false,
+      "requirements": [
+        "Разблокированный загрузчик",
+        "Platform-Tools / Fastboot",
+        "Заряд телефона не менее 50%"
+      ],
+      "warnings": [
+        "Установка кастомной прошивки стирает данные.",
+        "Не блокируйте загрузчик с кастомной прошивкой.",
+        "Проверьте совместимость сборки с кодовым именем устройства."
+      ],
+      "notes": "crDroid 10 10.8 для Motorola Moto G24 Power (fogor). Сборка на базе Android 14."
+    },
+    {
+      "id": "motorola-motorola-moto-g34-5g-myux",
+      "brand": "Motorola",
+      "model": "Motorola Moto G34 5G",
+      "codename": "fogos",
+      "os": "MyUX",
+      "os_version": "U3TNS34.41-121-6",
+      "android": "14",
+      "install_type": "local_update",
+      "region": "Global",
+      "size": "~4.2 GB",
+      "download_url": "https://support.motorola.com/us/en/software",
+      "page_url": "https://support.motorola.com/us/en/software",
+      "direct": false,
+      "requirements": [
+        "Официальный пакет производителя",
+        "Заряд телефона не менее 50%",
+        "Свободное место не менее 8 ГБ"
+      ],
+      "warnings": [
+        "Используйте пакет строго для своей модели и региона.",
+        "Перед обновлением сделайте резервную копию данных."
+      ],
+      "notes": "MyUX U3TNS34.41-121-6 для Motorola Moto G34 5G (fogos). Официальная прошивка MyUX."
+    },
+    {
+      "id": "motorola-motorola-moto-g34-5g-pixelos-14",
+      "brand": "Motorola",
+      "model": "Motorola Moto G34 5G",
+      "codename": "fogos",
+      "os": "PixelOS 14",
+      "os_version": "14.0-20241020",
+      "android": "14",
+      "install_type": "fastboot",
+      "region": "Global",
+      "size": "~1.7 GB",
+      "download_url": "https://pixelos.net/",
+      "page_url": "https://pixelos.net/",
+      "direct": false,
+      "requirements": [
+        "Разблокированный загрузчик",
+        "Platform-Tools / Fastboot",
+        "Заряд телефона не менее 50%"
+      ],
+      "warnings": [
+        "Установка кастомной прошивки стирает данные.",
+        "Не блокируйте загрузчик с кастомной прошивкой.",
+        "Проверьте совместимость сборки с кодовым именем устройства."
+      ],
+      "notes": "PixelOS 14 14.0-20241020 для Motorola Moto G34 5G (fogos). Сборка на базе Android 14."
+    },
+    {
+      "id": "motorola-motorola-moto-g54-5g-myux",
+      "brand": "Motorola",
+      "model": "Motorola Moto G54 5G",
+      "codename": "cancunf",
+      "os": "MyUX",
+      "os_version": "U1TNS34.41-121-5",
+      "android": "14",
+      "install_type": "local_update",
+      "region": "Global",
+      "size": "~4.2 GB",
+      "download_url": "https://support.motorola.com/us/en/software",
+      "page_url": "https://support.motorola.com/us/en/software",
+      "direct": false,
+      "requirements": [
+        "Официальный пакет производителя",
+        "Заряд телефона не менее 50%",
+        "Свободное место не менее 8 ГБ"
+      ],
+      "warnings": [
+        "Используйте пакет строго для своей модели и региона.",
+        "Перед обновлением сделайте резервную копию данных."
+      ],
+      "notes": "MyUX U1TNS34.41-121-5 для Motorola Moto G54 5G (cancunf). Официальная прошивка MyUX."
+    },
+    {
+      "id": "motorola-motorola-moto-g54-5g-evolution-x-9",
+      "brand": "Motorola",
+      "model": "Motorola Moto G54 5G",
+      "codename": "cancunf",
+      "os": "Evolution X 9",
+      "os_version": "9.6",
+      "android": "14",
+      "install_type": "adb_sideload",
+      "region": "Global",
+      "size": "~1.8 GB",
+      "download_url": "https://evolution-x.org/",
+      "page_url": "https://evolution-x.org/",
+      "direct": false,
+      "requirements": [
+        "Разблокированный загрузчик",
+        "Кастомный recovery (TWRP / Lineage Recovery)",
+        "Заряд телефона не менее 50%"
+      ],
+      "warnings": [
+        "Установка кастомной прошивки стирает данные.",
+        "Не блокируйте загрузчик с кастомной прошивкой.",
+        "Сделайте резервную копию перед установкой."
+      ],
+      "notes": "Evolution X 9 9.6 для Motorola Moto G54 5G (cancunf). Сборка на базе Android 14."
+    },
+    {
+      "id": "motorola-motorola-moto-g85-5g-myux",
+      "brand": "Motorola",
+      "model": "Motorola Moto G85 5G",
+      "codename": "fogo",
+      "os": "MyUX",
+      "os_version": "U4TNS34.41-121-9",
+      "android": "15",
+      "install_type": "local_update",
+      "region": "Global",
+      "size": "~4.4 GB",
+      "download_url": "https://support.motorola.com/us/en/software",
+      "page_url": "https://support.motorola.com/us/en/software",
+      "direct": false,
+      "requirements": [
+        "Официальный пакет производителя",
+        "Заряд телефона не менее 50%",
+        "Свободное место не менее 8 ГБ"
+      ],
+      "warnings": [
+        "Используйте пакет строго для своей модели и региона.",
+        "Перед обновлением сделайте резервную копию данных."
+      ],
+      "notes": "MyUX U4TNS34.41-121-9 для Motorola Moto G85 5G (fogo). Официальная прошивка MyUX."
+    },
+    {
+      "id": "motorola-motorola-moto-g85-5g-lineageos-22",
+      "brand": "Motorola",
+      "model": "Motorola Moto G85 5G",
+      "codename": "fogo",
+      "os": "LineageOS 22",
+      "os_version": "22.1-20250615",
+      "android": "15",
+      "install_type": "adb_sideload",
+      "region": "Global",
+      "size": "~1.9 GB",
+      "download_url": "https://download.lineageos.org/",
+      "page_url": "https://download.lineageos.org/",
+      "direct": false,
+      "requirements": [
+        "Разблокированный загрузчик",
+        "Кастомный recovery (TWRP / Lineage Recovery)",
+        "Заряд телефона не менее 50%"
+      ],
+      "warnings": [
+        "Установка кастомной прошивки стирает данные.",
+        "Не блокируйте загрузчик с кастомной прошивкой.",
+        "Сделайте резервную копию перед установкой."
+      ],
+      "notes": "LineageOS 22 22.1-20250615 для Motorola Moto G85 5G (fogo). Сборка на базе Android 15."
+    },
+    {
+      "id": "vivo-vivo-y18-funtouchos-14",
+      "brand": "Vivo",
+      "model": "Vivo Y18",
+      "codename": "V2333",
+      "os": "FuntouchOS 14",
+      "os_version": "PD2333F_EX_A_14.0.5",
+      "android": "14",
+      "install_type": "local_update",
+      "region": "Global",
+      "size": "~5.6 GB",
+      "download_url": "https://www.vivo.com/en/support",
+      "page_url": "https://www.vivo.com/en/support",
+      "direct": false,
+      "requirements": [
+        "Официальный пакет производителя",
+        "Заряд телефона не менее 50%",
+        "Свободное место не менее 8 ГБ"
+      ],
+      "warnings": [
+        "Используйте пакет строго для своей модели и региона.",
+        "Перед обновлением сделайте резервную копию данных.",
+        "Загрузчик Vivo/Honor заблокирован: используйте только официальное обновление или сервисный центр."
+      ],
+      "notes": "FuntouchOS 14 PD2333F_EX_A_14.0.5 для Vivo Y18 (V2333). Официальное локальное обновление; загрузчик заблокирован."
+    },
+    {
+      "id": "vivo-vivo-v40-lite-funtouchos-14",
+      "brand": "Vivo",
+      "model": "Vivo V40 Lite",
+      "codename": "V2341",
+      "os": "FuntouchOS 14",
+      "os_version": "PD2341F_EX_A_14.0.7",
+      "android": "14",
+      "install_type": "local_update",
+      "region": "Global",
+      "size": "~6.2 GB",
+      "download_url": "https://www.vivo.com/en/support",
+      "page_url": "https://www.vivo.com/en/support",
+      "direct": false,
+      "requirements": [
+        "Официальный пакет производителя",
+        "Заряд телефона не менее 50%",
+        "Свободное место не менее 8 ГБ"
+      ],
+      "warnings": [
+        "Используйте пакет строго для своей модели и региона.",
+        "Перед обновлением сделайте резервную копию данных.",
+        "Загрузчик Vivo/Honor заблокирован: используйте только официальное обновление или сервисный центр."
+      ],
+      "notes": "FuntouchOS 14 PD2341F_EX_A_14.0.7 для Vivo V40 Lite (V2341). Официальное локальное обновление; загрузчик заблокирован."
+    },
+    {
+      "id": "honor-honor-x6b-magicos-8",
+      "brand": "Honor",
+      "model": "Honor X6b",
+      "codename": "ELP-NX1",
+      "os": "MagicOS 8",
+      "os_version": "ELP-NX1 8.0.0.150",
+      "android": "14",
+      "install_type": "local_update",
+      "region": "Global",
+      "size": "~4.5 GB",
+      "download_url": "https://www.honor.com/global/support/",
+      "page_url": "https://www.honor.com/global/support/",
+      "direct": false,
+      "requirements": [
+        "Официальный пакет производителя",
+        "Заряд телефона не менее 50%",
+        "Свободное место не менее 8 ГБ"
+      ],
+      "warnings": [
+        "Используйте пакет строго для своей модели и региона.",
+        "Перед обновлением сделайте резервную копию данных.",
+        "Загрузчик Vivo/Honor заблокирован: используйте только официальное обновление или сервисный центр."
+      ],
+      "notes": "MagicOS 8 ELP-NX1 8.0.0.150 для Honor X6b (ELP-NX1). Официальное обновление Honor; загрузчик заблокирован."
+    },
+    {
+      "id": "honor-honor-x7b-magicos-8",
+      "brand": "Honor",
+      "model": "Honor X7b",
+      "codename": "CRT-NX1",
+      "os": "MagicOS 8",
+      "os_version": "CRT-NX1 8.0.0.160",
+      "android": "14",
+      "install_type": "local_update",
+      "region": "Global",
+      "size": "~4.8 GB",
+      "download_url": "https://www.honor.com/global/support/",
+      "page_url": "https://www.honor.com/global/support/",
+      "direct": false,
+      "requirements": [
+        "Официальный пакет производителя",
+        "Заряд телефона не менее 50%",
+        "Свободное место не менее 8 ГБ"
+      ],
+      "warnings": [
+        "Используйте пакет строго для своей модели и региона.",
+        "Перед обновлением сделайте резервную копию данных.",
+        "Загрузчик Vivo/Honor заблокирован: используйте только официальное обновление или сервисный центр."
+      ],
+      "notes": "MagicOS 8 CRT-NX1 8.0.0.160 для Honor X7b (CRT-NX1). Официальное обновление Honor; загрузчик заблокирован."
+    },
+    {
+      "id": "honor-honor-x8b-magicos-8",
+      "brand": "Honor",
+      "model": "Honor X8b",
+      "codename": "CGA-NX1",
+      "os": "MagicOS 8",
+      "os_version": "CGA-NX1 8.0.0.170",
+      "android": "14",
+      "install_type": "local_update",
+      "region": "Global",
+      "size": "~5.0 GB",
+      "download_url": "https://www.honor.com/global/support/",
+      "page_url": "https://www.honor.com/global/support/",
+      "direct": false,
+      "requirements": [
+        "Официальный пакет производителя",
+        "Заряд телефона не менее 50%",
+        "Свободное место не менее 8 ГБ"
+      ],
+      "warnings": [
+        "Используйте пакет строго для своей модели и региона.",
+        "Перед обновлением сделайте резервную копию данных.",
+        "Загрузчик Vivo/Honor заблокирован: используйте только официальное обновление или сервисный центр."
+      ],
+      "notes": "MagicOS 8 CGA-NX1 8.0.0.170 для Honor X8b (CGA-NX1). Официальное обновление Honor; загрузчик заблокирован."
+    },
+    {
+      "id": "honor-honor-x9b-magicos-8",
+      "brand": "Honor",
+      "model": "Honor X9b",
+      "codename": "ALI-NX1",
+      "os": "MagicOS 8",
+      "os_version": "ALI-NX1 8.0.0.180",
+      "android": "14",
+      "install_type": "local_update",
+      "region": "Global",
+      "size": "~5.6 GB",
+      "download_url": "https://www.honor.com/global/support/",
+      "page_url": "https://www.honor.com/global/support/",
+      "direct": false,
+      "requirements": [
+        "Официальный пакет производителя",
+        "Заряд телефона не менее 50%",
+        "Свободное место не менее 8 ГБ"
+      ],
+      "warnings": [
+        "Используйте пакет строго для своей модели и региона.",
+        "Перед обновлением сделайте резервную копию данных.",
+        "Загрузчик Vivo/Honor заблокирован: используйте только официальное обновление или сервисный центр."
+      ],
+      "notes": "MagicOS 8 ALI-NX1 8.0.0.180 для Honor X9b (ALI-NX1). Официальное обновление Honor; загрузчик заблокирован."
+    },
+    {
+      "id": "honor-honor-200-lite-magicos-8",
+      "brand": "Honor",
+      "model": "Honor 200 Lite",
+      "codename": "LLY-NX1",
+      "os": "MagicOS 8",
+      "os_version": "LLY-NX1 8.0.0.190",
+      "android": "14",
+      "install_type": "local_update",
+      "region": "Global",
+      "size": "~5.4 GB",
+      "download_url": "https://www.honor.com/global/support/",
+      "page_url": "https://www.honor.com/global/support/",
+      "direct": false,
+      "requirements": [
+        "Официальный пакет производителя",
+        "Заряд телефона не менее 50%",
+        "Свободное место не менее 8 ГБ"
+      ],
+      "warnings": [
+        "Используйте пакет строго для своей модели и региона.",
+        "Перед обновлением сделайте резервную копию данных.",
+        "Загрузчик Vivo/Honor заблокирован: используйте только официальное обновление или сервисный центр."
+      ],
+      "notes": "MagicOS 8 LLY-NX1 8.0.0.190 для Honor 200 Lite (LLY-NX1). Официальное обновление Honor; загрузчик заблокирован."
+    },
+    {
+      "id": "google-google-pixel-8a-risingos-6",
+      "brand": "Google",
+      "model": "Google Pixel 8a",
+      "codename": "akita",
+      "os": "RisingOS 6",
+      "os_version": "6.0",
+      "android": "15",
+      "install_type": "adb_sideload",
+      "region": "Global",
+      "size": "~1.8 GB",
+      "download_url": "https://risingosrevived.org/",
+      "page_url": "https://risingosrevived.org/",
+      "direct": false,
+      "requirements": [
+        "Разблокированный загрузчик",
+        "Кастомный recovery (TWRP / Lineage Recovery)",
+        "Заряд телефона не менее 50%"
+      ],
+      "warnings": [
+        "Установка кастомной прошивки стирает данные.",
+        "Не блокируйте загрузчик с кастомной прошивкой.",
+        "Сделайте резервную копию перед установкой."
+      ],
+      "notes": "RisingOS 6 6.0 для Google Pixel 8a (akita). Сборка на базе Android 15."
+    },
+    {
+      "id": "google-google-pixel-9-lineageos-22",
+      "brand": "Google",
+      "model": "Google Pixel 9",
+      "codename": "tokay",
+      "os": "LineageOS 22",
+      "os_version": "22.1-20250615",
+      "android": "15",
+      "install_type": "adb_sideload",
+      "region": "Global",
+      "size": "~1.9 GB",
+      "download_url": "https://download.lineageos.org/",
+      "page_url": "https://download.lineageos.org/",
+      "direct": false,
+      "requirements": [
+        "Разблокированный загрузчик",
+        "Кастомный recovery (TWRP / Lineage Recovery)",
+        "Заряд телефона не менее 50%"
+      ],
+      "warnings": [
+        "Установка кастомной прошивки стирает данные.",
+        "Не блокируйте загрузчик с кастомной прошивкой.",
+        "Сделайте резервную копию перед установкой."
+      ],
+      "notes": "LineageOS 22 22.1-20250615 для Google Pixel 9 (tokay). Сборка на базе Android 15."
+    },
+    {
+      "id": "google-google-pixel-9-pro-crdroid-11",
+      "brand": "Google",
+      "model": "Google Pixel 9 Pro",
+      "codename": "caiman",
+      "os": "crDroid 11",
+      "os_version": "11.2",
+      "android": "15",
+      "install_type": "adb_sideload",
+      "region": "Global",
+      "size": "~2.0 GB",
+      "download_url": "https://crdroid.net/",
+      "page_url": "https://crdroid.net/",
+      "direct": false,
+      "requirements": [
+        "Разблокированный загрузчик",
+        "Кастомный recovery (TWRP / Lineage Recovery)",
+        "Заряд телефона не менее 50%"
+      ],
+      "warnings": [
+        "Установка кастомной прошивки стирает данные.",
+        "Не блокируйте загрузчик с кастомной прошивкой.",
+        "Сделайте резервную копию перед установкой."
+      ],
+      "notes": "crDroid 11 11.2 для Google Pixel 9 Pro (caiman). Сборка на базе Android 15."
+    },
+    {
+      "id": "google-google-pixel-9a-evolution-x-10",
+      "brand": "Google",
+      "model": "Google Pixel 9a",
+      "codename": "tegu",
+      "os": "Evolution X 10",
+      "os_version": "10.2",
+      "android": "15",
+      "install_type": "adb_sideload",
+      "region": "Global",
+      "size": "~1.9 GB",
+      "download_url": "https://evolution-x.org/",
+      "page_url": "https://evolution-x.org/",
+      "direct": false,
+      "requirements": [
+        "Разблокированный загрузчик",
+        "Кастомный recovery (TWRP / Lineage Recovery)",
+        "Заряд телефона не менее 50%"
+      ],
+      "warnings": [
+        "Установка кастомной прошивки стирает данные.",
+        "Не блокируйте загрузчик с кастомной прошивкой.",
+        "Сделайте резервную копию перед установкой."
+      ],
+      "notes": "Evolution X 10 10.2 для Google Pixel 9a (tegu). Сборка на базе Android 15."
     }
   ]
 }
