@@ -1,15 +1,23 @@
 """
-KitagawaUtilits v7.0.
+KitagawaUtilits v7.1.
 
 Простой и безопасный помощник для Android на Windows.
 
-Что нового в версии 7.0:
+Что нового в версии 7.1:
+  * умный резолвер прямых .zip-ссылок по коду устройства (codename):
+    LineageOS API, SourceForge RSS (crDroid, Evolution X, PixelOS, RisingOS),
+    GitHub Releases и OTA-JSON кастомных прошивок;
+  * архив реально скачивается внутри окна с прогресс-баром, а браузер
+    открывается только если ни один источник не отдал прямой файл;
+  * прокручиваемая боковая панель и переключатель 5 языков внизу;
+  * исправлена загрузка больших архивов: HTML-страница вместо файла
+    больше не сохраняется как прошивка.
+
+Возможности версии 7.0:
   * встроенный менеджер прямого скачивания прошивок прямо в программе;
   * живой прогресс-бар: процент, объём и скорость загрузки;
   * скачивание в фоновом потоке с потоковой записью на диск (chunk_size = 65536);
   * кнопка отмены загрузки и автопереход к установке после завершения;
-  * умный поиск прямой ссылки на .zip через GitHub API с запасным открытием
-    страницы релиза в браузере;
   * скачанные архивы сохраняются в Downloads\\KitagawaFirmwares;
   * 5 языков интерфейса: русский, English, Українська, Español, 中文;
   * выбор языка в боковой панели с мгновенным переводом без перезапуска;
@@ -29,6 +37,7 @@ KitagawaUtilits v7.0.
 
 import ctypes
 import hashlib
+import html
 import json
 import math
 import os
@@ -58,9 +67,9 @@ except Exception:  # noqa: BLE001
 # Константы
 # ---------------------------------------------------------------------------
 APP_NAME = "KitagawaUtilits"
-APP_VERSION = "7.0.0"
+APP_VERSION = "7.1"
 APP_SUBTITLE = "Простой и безопасный помощник для Android"
-APP_TITLE = "KitagawaUtilits v7.0"
+APP_TITLE = "KitagawaUtilits v7.1"
 
 # Скрывает консольное окно Windows при запуске дочерних процессов.
 CREATE_NO_WINDOW = 0x08000000
@@ -529,28 +538,76 @@ class FirmwareDownloader:
         даже при скачивании архивов на 3–5 ГБ;
       * прогресс, объём и скорость загрузки через колбэки в UI-поток;
       * отмена через threading.Event;
-      * умный поиск прямой ссылки на .zip: GitHub API, затем разбор HTML,
-        затем запасное открытие страницы релиза в браузере.
+      * умный резолвер прямых ссылок по названию прошивки и codename:
+        LineageOS API, SourceForge RSS (crDroid, Evolution X, PixelOS,
+        RisingOS), GitHub Releases и OTA-JSON кастомных прошивок;
+      * браузер открывается только если ни один API не отдал файл.
     """
 
     CHUNK_SIZE = 65536
     USER_AGENT = (
         "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
-        "(KHTML, like Gecko) Chrome/124.0 Safari/537.36 KitagawaUtilits/7.0"
+        "(KHTML, like Gecko) Chrome/124.0 Safari/537.36 KitagawaUtilits/7.1"
     )
     FILE_EXTENSIONS = (
         ".zip", ".img", ".bin", ".tar", ".tar.gz", ".tgz",
         ".7z", ".rar", ".xz", ".gz",
     )
+    # Для JSON/API-резолверов ищем именно архивы прошивки, а не boot.img.
+    ARCHIVE_EXTENSIONS = (".zip", ".tgz")
+
+    # GitHub: поддерживаем и страницу релиза, и корень репозитория.
     GITHUB_RE = re.compile(
-        r"^https?://(?:www\.)?github\.com/([^/]+)/([^/]+)/releases"
-        r"(?:/(?:tag|download)/([^/?#]+))?",
+        r"^https?://(?:www\.)?github\.com/([^/]+)/([^/?#]+)"
+        r"(?:/releases(?:/(?:tag|download)/([^/?#]+))?)?",
         re.IGNORECASE,
     )
     HTML_LINK_RE = re.compile(
         r"""(?:href|src|data-url)\s*=\s*["']([^"']+?\.(?:zip|img|bin|tar\.gz|tgz|7z|rar|xz))["']""",
         re.IGNORECASE,
     )
+    # Прямые ссылки на файл, спрятанные в JSON/HTML (в том числе с \/).
+    ESCAPED_LINK_RE = re.compile(
+        r"https?:\\?/\\?/[^\"'<>\s]+?\.(?:zip|tgz)", re.IGNORECASE
+    )
+    SOURCEFORGE_FILE_LINK_RE = re.compile(
+        r"https?://(?:www\.)?sourceforge\.net/projects/[^\"'<>\s]+?\.zip/download",
+        re.IGNORECASE,
+    )
+    SOURCEFORGE_ITEM_RE = re.compile(r"<item>(.*?)</item>", re.IGNORECASE | re.DOTALL)
+
+    # Официальное API LineageOS (v2 — актуальное, v1 — запасное).
+    LINEAGE_API_TEMPLATES = (
+        "https://download.lineageos.org/api/v2/devices/{codename}/builds",
+        "https://download.lineageos.org/api/v1/{codename}/nightly/1",
+        "https://lineageos.org/api/v2/devices/{codename}/builds",
+    )
+
+    # Какие SourceForge-проекты соответствуют названию прошивки.
+    SOURCEFORGE_OS_PROJECTS = {
+        "crdroid": ("crdroid",),
+        "evolution x": ("evolution-x",),
+        "pixelos": ("pixelos", "pixelos-releases", "pixelos-aosp"),
+        "risingos": ("risingos", "risingos-releases", "risingos-revived"),
+        "derpfest": ("derpfest",),
+        "xiaomi.eu": ("xiaomi-eu-multilang-miui-roms",),
+    }
+
+    # GitHub-репозитории с OTA-JSON: {название прошивки: (репозитории, ветки)}.
+    OTA_JSON_SOURCES = {
+        "pixelos": (
+            ("PixelOS-AOSP/ota", "PixelOS-AOSP/ota_configs"),
+            ("sixteen", "fifteen", "main"),
+        ),
+        "risingos": (
+            ("RisingOS-Revived/ota",),
+            ("seventeen", "sixteen", "fifteen", "main"),
+        ),
+        "evolution x": (
+            ("Evolution-X/OTA",),
+            ("sixteen", "fifteen", "fourteen", "main"),
+        ),
+    }
 
     def __init__(self, app, firmware: dict, on_progress=None, on_status=None,
                  on_done=None, on_fallback=None, on_error=None,
@@ -608,29 +665,327 @@ class FirmwareDownloader:
 
     @classmethod
     def _request(cls, url: str, accept: str | None = None) -> urllib.request.Request:
-        headers = {"User-Agent": cls.USER_AGENT}
+        headers = {
+            "User-Agent": cls.USER_AGENT,
+            "Accept-Language": "en-US,en;q=0.9,ru;q=0.8",
+        }
         if accept:
             headers["Accept"] = accept
         return urllib.request.Request(url, headers=headers)
 
-    def _resolve_github(self, url: str) -> str | None:
-        match = self.GITHUB_RE.match(url)
-        if not match:
-            return None
-        owner, repo, tag = match.groups()
-        if tag and "/releases/download/" in url:
-            return None
-        if tag:
-            api = f"https://api.github.com/repos/{owner}/{repo}/releases/tags/{tag}"
-        else:
-            api = f"https://api.github.com/repos/{owner}/{repo}/releases/latest"
+    # ------------------------------------------------------------------
+    # Низкоуровневые помощники
+    # ------------------------------------------------------------------
+    def _fetch(self, url: str, accept: str | None = None,
+               limit: int = 1024 * 1024, timeout: int = 20) -> bytes | None:
         try:
-            request = self._request(api, "application/vnd.github+json")
-            with urllib.request.urlopen(request, timeout=20) as response:
-                data = json.loads(response.read().decode("utf-8", "replace"))
+            request = self._request(url, accept)
+            with urllib.request.urlopen(request, timeout=timeout) as response:
+                return response.read(limit)
         except Exception:  # noqa: BLE001
             return None
 
+    def _fetch_text(self, url: str, accept: str | None = None,
+                    limit: int = 1024 * 1024, timeout: int = 20) -> str:
+        raw = self._fetch(url, accept, limit, timeout)
+        return raw.decode("utf-8", "replace") if raw else ""
+
+    def _fetch_json(self, url: str, timeout: int = 20):
+        raw = self._fetch(url, "application/json, text/plain, */*",
+                          2 * 1024 * 1024, timeout)
+        if not raw:
+            return None
+        try:
+            return json.loads(raw.decode("utf-8", "replace"))
+        except (ValueError, UnicodeError):
+            return None
+
+    @classmethod
+    def _is_archive_url(cls, value) -> bool:
+        """True, если строка — прямая http(s)-ссылка на .zip/.tgz."""
+        if not isinstance(value, str):
+            return False
+        value = value.strip()
+        if not value.lower().startswith(("http://", "https://")):
+            return False
+        try:
+            path = urllib.parse.urlparse(value).path.lower()
+        except Exception:  # noqa: BLE001
+            return False
+        if path.endswith(cls.ARCHIVE_EXTENSIONS):
+            return True
+        # SourceForge: .../file.zip/download (ссылку потом превратим в зеркало).
+        return path.endswith("/download") and ".zip/" in path
+
+    def _find_archive_in_json(self, data, depth: int = 0) -> str | None:
+        """Ищет первый .zip/.tgz в JSON любой структуры.
+
+        Понимает формат LineageOS (files[0]["url"]), OTA-JSON кастомных
+        прошивок (response[0]["url"]) и GitHub Releases (assets).
+        """
+        if depth > 8:
+            return None
+        if isinstance(data, dict):
+            files = data.get("files")
+            if isinstance(files, list):
+                for item in files:
+                    found = self._find_archive_in_json(item, depth + 1)
+                    if found:
+                        return found
+            for key in ("url", "download_url", "download", "link", "file"):
+                value = data.get(key)
+                if self._is_archive_url(value):
+                    return value.strip()
+            for value in data.values():
+                if self._is_archive_url(value):
+                    return value.strip()
+            for value in data.values():
+                if isinstance(value, (dict, list)):
+                    found = self._find_archive_in_json(value, depth + 1)
+                    if found:
+                        return found
+            return None
+        if isinstance(data, list):
+            for item in data:
+                found = self._find_archive_in_json(item, depth + 1)
+                if found:
+                    return found
+            return None
+        if self._is_archive_url(data):
+            return data.strip()
+        return None
+
+    def _normalize_direct(self, candidate: str | None) -> str | None:
+        """Превращает SourceForge-страницу /download в прямую ссылку зеркала."""
+        if not candidate:
+            return None
+        candidate = candidate.strip()
+        if ("sourceforge.net/projects/" in candidate
+                and ".zip/download" in candidate.lower()):
+            return self._sourceforge_direct(candidate)
+        return candidate
+
+    # ------------------------------------------------------------------
+    # LineageOS API
+    # ------------------------------------------------------------------
+    def _resolve_lineage(self, codename: str) -> str | None:
+        """Берёт ссылку на .zip последней сборки из официального API LineageOS.
+
+        API v2 отдаёт список сборок (сначала самые свежие), у каждой —
+        список файлов. Берём последний файл самой свежей сборки, как на
+        странице https://lineageos.org/api/v2/devices/<codename>/builds.
+        """
+        if not codename:
+            return None
+        safe = urllib.parse.quote(codename.strip(), safe="")
+        for template in self.LINEAGE_API_TEMPLATES:
+            api = template.format(codename=safe)
+            data = self._fetch_json(api)
+            if not data:
+                continue
+            # Новый формат API v2: [{"files": [{"url": ...}, ...]}, ...]
+            builds = data if isinstance(data, list) else [data]
+            for build in builds:
+                if not isinstance(build, dict):
+                    continue
+                files = build.get("files")
+                if not isinstance(files, list) or not files:
+                    continue
+                for item in reversed(files):
+                    link = item.get("url") if isinstance(item, dict) else item
+                    if self._is_archive_url(link):
+                        return self._normalize_direct(str(link).strip())
+            # Запасной разбор JSON любой структуры.
+            found = self._find_archive_in_json(data)
+            if found:
+                return self._normalize_direct(found)
+        return None
+
+    # ------------------------------------------------------------------
+    # SourceForge RSS (crDroid, Evolution X, PixelOS, RisingOS, Xiaomi.eu)
+    # ------------------------------------------------------------------
+    @staticmethod
+    def _rss_value(block: str, tag: str) -> str:
+        match = re.search(
+            rf"<{tag}>\s*(?:<!\[CDATA\[)?(.*?)(?:\]\]>)?\s*</{tag}>",
+            block, re.IGNORECASE | re.DOTALL,
+        )
+        return html.unescape(match.group(1).strip()) if match else ""
+
+    @staticmethod
+    def _curl_text(url: str, timeout: int = 25) -> str:
+        """Запасной HTTP-клиент через curl.exe (есть в Windows 10/11).
+
+        SourceForge иногда отвечает 403 на urllib из-за проверки Cloudflare,
+        поэтому страницу загрузки читаем системным curl.
+        """
+        curl = os.path.join(
+            os.environ.get("SystemRoot", r"C:\Windows"), "System32", "curl.exe"
+        )
+        if not os.path.isfile(curl):
+            return ""
+        try:
+            result = subprocess.run(
+                [
+                    curl, "-sSL", "--max-time", str(timeout),
+                    "-A", FirmwareDownloader.USER_AGENT, url,
+                ],
+                capture_output=True,
+                timeout=timeout + 5,
+                creationflags=popen_flags(),
+            )
+        except Exception:  # noqa: BLE001
+            return ""
+        if result.returncode != 0 or not result.stdout:
+            return ""
+        return result.stdout.decode("utf-8", "replace")
+
+    @staticmethod
+    def _powershell_path() -> str:
+        powershell = os.path.join(
+            os.environ.get("SystemRoot", r"C:\Windows"),
+            "System32", "WindowsPowerShell", "v1.0", "powershell.exe",
+        )
+        return powershell if os.path.isfile(powershell) else "powershell.exe"
+
+    @classmethod
+    def _powershell_text(cls, url: str, timeout: int = 30) -> str:
+        """Третий запасной клиент: Invoke-WebRequest через PowerShell.
+
+        Cloudflare на SourceForge пропускает .NET HttpClient, но блокирует
+        urllib и curl, поэтому используем системный PowerShell.
+        """
+        powershell = cls._powershell_path()
+        safe_url = url.replace("'", "%27")
+        script = (
+            "$ProgressPreference='SilentlyContinue'; "
+            f"$r=Invoke-WebRequest -UseBasicParsing -Uri '{safe_url}' "
+            f"-TimeoutSec {max(5, timeout - 5)}; "
+            "[Console]::OutputEncoding=[Text.Encoding]::UTF8; $r.Content"
+        )
+        try:
+            result = subprocess.run(
+                [powershell, "-NoProfile", "-NonInteractive", "-Command", script],
+                capture_output=True,
+                timeout=timeout + 10,
+                creationflags=popen_flags(),
+            )
+        except Exception:  # noqa: BLE001
+            return ""
+        if result.returncode != 0 or not result.stdout:
+            return ""
+        for encoding in ("utf-8", "cp1251", "cp866"):
+            try:
+                return result.stdout.decode(encoding)
+            except UnicodeDecodeError:
+                continue
+        return result.stdout.decode("utf-8", "replace")
+
+    @staticmethod
+    def _extract_sourceforge_direct(page: str) -> str | None:
+        if not page:
+            return None
+        for pattern in (
+            r"url=(https?://downloads\.sourceforge\.net/[^\"'<>\s]+)",
+            r"data-release-url=[\"'](https?://[^\"']+)[\"']",
+        ):
+            match = re.search(pattern, page, re.IGNORECASE)
+            if match:
+                candidate = html.unescape(match.group(1)).strip()
+                if candidate.lower().startswith("http"):
+                    return candidate
+        return None
+
+    def _sourceforge_direct(self, download_url: str) -> str | None:
+        """Достаёт из страницы SourceForge ссылку на зеркало с токеном."""
+        page = self._fetch_text(
+            download_url, "text/html,application/xhtml+xml",
+            limit=1024 * 1024, timeout=25,
+        )
+        direct = self._extract_sourceforge_direct(page)
+        if direct:
+            return direct
+
+        page = self._curl_text(download_url, timeout=25)
+        direct = self._extract_sourceforge_direct(page)
+        if direct:
+            return direct
+
+        page = self._powershell_text(download_url, timeout=35)
+        return self._extract_sourceforge_direct(page)
+
+    def _resolve_sourceforge(self, project: str, codename: str) -> str | None:
+        """Ищет первый .zip в RSS SourceForge по codename (или по всему проекту)."""
+        paths = ["/"]
+        if codename:
+            paths.insert(0, "/" + codename.strip().strip("/"))
+        for path in paths:
+            rss = (
+                "https://sourceforge.net/projects/"
+                f"{urllib.parse.quote(project, safe='')}/rss?path="
+                f"{urllib.parse.quote(path, safe='/')}"
+            )
+            xml = self._fetch_text(
+                rss, "application/rss+xml, application/xml, text/xml", timeout=25
+            )
+            if not xml:
+                continue
+            for block in self.SOURCEFORGE_ITEM_RE.findall(xml):
+                link = self._rss_value(block, "link")
+                title = self._rss_value(block, "title")
+                if not link:
+                    continue
+                link_path = urllib.parse.urlparse(link).path.lower()
+                if not (link_path.endswith(".zip/download")
+                        or link_path.endswith(".zip")):
+                    continue
+                if path == "/" and codename:
+                    haystack = f"{title} {link}".lower()
+                    if codename.strip().lower() not in haystack:
+                        continue
+                direct = self._sourceforge_direct(link)
+                if direct:
+                    return direct
+                # Если зеркало с токеном разобрать не удалось, отдаём саму
+                # ссылку .../file.zip/download — это тоже прямая .zip-ссылка.
+                return link
+        return None
+
+    def _codename(self) -> str:
+        """Codename устройства: из каталога, а если нет — из ссылки."""
+        code = str(self.firmware.get("codename") or "").strip()
+        if code:
+            return code
+        for key in ("download_url", "page_url"):
+            url = str(self.firmware.get(key) or "")
+            match = re.search(
+                r"(?:/devices/|/downloads/|crdroid\.net/|pixelos\.net/|"
+                r"evolution-x\.org/downloads/)([A-Za-z0-9._-]+)",
+                url, re.IGNORECASE,
+            )
+            if match:
+                return match.group(1)
+        return ""
+
+    def _sourceforge_from_url(self, url: str) -> str | None:
+        """Резолвит обычную страницу проекта SourceForge."""
+        match = re.match(
+            r"^https?://(?:www\.)?sourceforge\.net/projects/([^/]+)/files(?:/(.*))?$",
+            url, re.IGNORECASE,
+        )
+        if not match:
+            return None
+        project = match.group(1)
+        path = (match.group(2) or "").strip("/")
+        codename = self._codename()
+        if path and path.lower() not in {"latest", "files"}:
+            codename = path.split("/")[0]
+        return self._resolve_sourceforge(project, codename)
+
+    # ------------------------------------------------------------------
+    # GitHub Releases и OTA-JSON
+    # ------------------------------------------------------------------
+    def _github_assets(self, data) -> str | None:
         assets = data.get("assets") if isinstance(data, dict) else None
         if not isinstance(assets, list):
             return None
@@ -644,20 +999,74 @@ class FirmwareDownloader:
                 candidates.append(link)
         if not candidates:
             return None
-        candidates.sort(key=lambda item: (0 if item.lower().endswith(".zip") else 1, len(item)))
+        candidates.sort(
+            key=lambda item: (0 if item.lower().endswith(".zip") else 1, len(item))
+        )
         return candidates[0]
 
+    def _resolve_github(self, url: str) -> str | None:
+        match = self.GITHUB_RE.match(url)
+        if not match:
+            return None
+        owner, repo, tag = match.groups()
+        if "/releases/download/" in url:
+            return None
+        apis: list[str] = []
+        if tag:
+            apis.append(
+                f"https://api.github.com/repos/{owner}/{repo}/releases/tags/{tag}"
+            )
+        apis.append(f"https://api.github.com/repos/{owner}/{repo}/releases/latest")
+        for api in apis:
+            data = self._fetch_json(api)
+            found = self._github_assets(data) if data else None
+            if found:
+                return found
+        releases = self._fetch_json(
+            f"https://api.github.com/repos/{owner}/{repo}/releases?per_page=10"
+        )
+        if isinstance(releases, list):
+            for release in releases:
+                found = self._github_assets(release)
+                if found:
+                    return found
+        return None
+
+    def _resolve_ota_json(self, repos, branches, codename: str) -> str | None:
+        """Читает OTA-JSON кастомной прошивки из GitHub и берёт ссылку на .zip."""
+        if not codename:
+            return None
+        codename = codename.strip()
+        for repo in repos:
+            for branch in branches:
+                for template in ("{codename}.json", "builds/{codename}.json"):
+                    path = template.format(codename=codename)
+                    api = f"https://raw.githubusercontent.com/{repo}/{branch}/{path}"
+                    data = self._fetch_json(api, timeout=8)
+                    found = self._find_archive_in_json(data) if data else None
+                    if found:
+                        return self._normalize_direct(found)
+        return None
+
+    # ------------------------------------------------------------------
+    # Разбор HTML как последний шанс
+    # ------------------------------------------------------------------
     def _resolve_html(self, url: str) -> str | None:
-        try:
-            request = self._request(url, "text/html,application/xhtml+xml")
-            with urllib.request.urlopen(request, timeout=20) as response:
-                raw = response.read(512 * 1024)
-                charset = response.headers.get_content_charset() or "utf-8"
-            html = raw.decode(charset, "replace")
-        except Exception:  # noqa: BLE001
+        page = self._fetch_text(
+            url, "text/html,application/xhtml+xml",
+            limit=1024 * 1024, timeout=25,
+        )
+        if not page:
             return None
 
-        for candidate in self.HTML_LINK_RE.findall(html):
+        # 1) SourceForge-ссылки на .zip внутри страницы.
+        for link in self.SOURCEFORGE_FILE_LINK_RE.findall(page):
+            direct = self._sourceforge_direct(html.unescape(link))
+            if direct:
+                return direct
+
+        # 2) Прямые .zip/.img в href/src/data-url.
+        for candidate in self.HTML_LINK_RE.findall(page):
             candidate = candidate.strip()
             if candidate.startswith("//"):
                 candidate = "https:" + candidate
@@ -665,15 +1074,53 @@ class FirmwareDownloader:
                 candidate = urllib.parse.urljoin(url, candidate)
             if candidate.lower().endswith(self.FILE_EXTENSIONS):
                 return candidate
+
+        # 3) Ссылки, спрятанные в JSON/JS (в том числе с экранированием \/).
+        for candidate in self.ESCAPED_LINK_RE.findall(page):
+            candidate = candidate.replace("\\/", "/").strip()
+            if candidate.lower().startswith(("http://", "https://")):
+                return candidate
         return None
 
     def resolve_url(self, url: str) -> str | None:
-        """Возвращает прямую ссылку на архив или None, если её не найти."""
+        """Возвращает прямую ссылку на архив или None, если её не найти.
+
+        Порядок: прямой файл -> GitHub -> LineageOS -> SourceForge по
+        названию прошивки -> OTA-JSON -> SourceForge из URL -> разбор HTML.
+        """
         if self.is_direct_url(url):
             return url
+
+        codename = self._codename()
+        os_name = str(self.firmware.get("os") or "").strip().lower()
+        haystack = f"{os_name} {url}".lower()
+
         github = self._resolve_github(url)
         if github:
             return github
+
+        if "lineage" in haystack:
+            found = self._resolve_lineage(codename)
+            if found:
+                return found
+
+        for key, projects in self.SOURCEFORGE_OS_PROJECTS.items():
+            if key in haystack:
+                for project in projects:
+                    found = self._resolve_sourceforge(project, codename)
+                    if found:
+                        return found
+
+        for key, (repos, branches) in self.OTA_JSON_SOURCES.items():
+            if key in haystack:
+                found = self._resolve_ota_json(repos, branches, codename)
+                if found:
+                    return found
+
+        found = self._sourceforge_from_url(url)
+        if found:
+            return found
+
         return self._resolve_html(url)
 
     # ------------------------------------------------------------------
@@ -713,16 +1160,25 @@ class FirmwareDownloader:
             self._emit(self.on_error, "в каталоге нет ссылки на прошивку")
             return
 
+        if self.cancel_event.is_set():
+            self._emit(self.on_cancel)
+            return
+
         self._emit(self.on_status, "resolving")
         try:
             direct = self.resolve_url(url)
         except Exception:  # noqa: BLE001
             direct = None
 
+        if self.cancel_event.is_set():
+            self._emit(self.on_cancel)
+            return
+
         if not direct:
             self._emit(self.on_fallback, url)
             return
 
+        self._emit(self.on_status, "resolved", direct)
         self._emit(self.on_status, "downloading")
         try:
             self._download(direct)
@@ -730,6 +1186,13 @@ class FirmwareDownloader:
             self._emit(self.on_cancel)
         except Exception as exc:  # noqa: BLE001
             self._emit(self.on_error, str(exc))
+
+    @staticmethod
+    def _curl_path() -> str:
+        curl = os.path.join(
+            os.environ.get("SystemRoot", r"C:\Windows"), "System32", "curl.exe"
+        )
+        return curl if os.path.isfile(curl) else ""
 
     def _download(self, url: str) -> None:
         os.makedirs(FIRMWARE_DOWNLOAD_DIR, exist_ok=True)
@@ -740,51 +1203,182 @@ class FirmwareDownloader:
         self.downloaded = 0
         self.total = 0
         self.speed = 0.0
-        last_time = time.time()
-        last_bytes = 0
 
-        request = self._request(url)
         try:
-            with urllib.request.urlopen(request, timeout=30) as response, \
-                    open(temp, "wb") as output:
-                self.total = int(response.headers.get("Content-Length") or 0)
-                self._emit(self.on_progress, 0, self.total, 0.0)
-
-                while True:
-                    if self.cancel_event.is_set():
-                        raise DownloadCancelled()
-                    chunk = response.read(self.CHUNK_SIZE)
-                    if not chunk:
-                        break
-                    output.write(chunk)
-                    self.downloaded += len(chunk)
-                    now = time.time()
-                    if now - last_time >= 0.2:
-                        instant = (self.downloaded - last_bytes) / max(now - last_time, 1e-6)
-                        self.speed = (
-                            instant if self.speed <= 0
-                            else self.speed * 0.6 + instant * 0.4
-                        )
-                        last_time = now
-                        last_bytes = self.downloaded
-                        self._emit(self.on_progress, self.downloaded,
-                                   self.total, self.speed)
-
-            if self.cancel_event.is_set():
-                raise DownloadCancelled()
-            if self.total <= 0:
-                self.total = self.downloaded
-            os.replace(temp, target)
+            self._download_with_urllib(url, temp, target)
         except DownloadCancelled:
             self._remove_quietly(temp)
             raise
-        except Exception:
+        except Exception as urllib_error:  # noqa: BLE001
             self._remove_quietly(temp)
-            raise
+            if not self._curl_path():
+                raise
+            # Cloudflare на SourceForge отдаёт 403 urllib, но пропускает curl.
+            try:
+                self._download_with_curl(url, temp, target)
+            except DownloadCancelled:
+                self._remove_quietly(temp)
+                raise
+            except Exception as curl_error:  # noqa: BLE001
+                self._remove_quietly(temp)
+                raise RuntimeError(
+                    f"{urllib_error}; через curl: {curl_error}"
+                ) from curl_error
 
+        if self.total <= 0:
+            self.total = self.downloaded
         self.path = target
         self._emit(self.on_progress, self.downloaded, self.total, self.speed)
         self._emit(self.on_done, target)
+
+    def _download_with_urllib(self, url: str, temp: str, target: str) -> None:
+        last_time = time.time()
+        last_bytes = 0
+        request = self._request(url, "*/*")
+        with urllib.request.urlopen(request, timeout=30) as response, \
+                open(temp, "wb") as output:
+            content_type = (response.headers.get("Content-Type") or "").lower()
+            if "text/html" in content_type:
+                raise RuntimeError(
+                    "сервер вернул HTML-страницу вместо архива "
+                    "(ссылка устарела или требует входа на сайт)"
+                )
+            self.total = int(response.headers.get("Content-Length") or 0)
+            self._emit(self.on_progress, 0, self.total, 0.0)
+
+            while True:
+                if self.cancel_event.is_set():
+                    raise DownloadCancelled()
+                chunk = response.read(self.CHUNK_SIZE)
+                if not chunk:
+                    break
+                output.write(chunk)
+                self.downloaded += len(chunk)
+                now = time.time()
+                if now - last_time >= 0.2:
+                    instant = (self.downloaded - last_bytes) / max(
+                        now - last_time, 1e-6
+                    )
+                    self.speed = (
+                        instant if self.speed <= 0
+                        else self.speed * 0.6 + instant * 0.4
+                    )
+                    last_time = now
+                    last_bytes = self.downloaded
+                    self._emit(self.on_progress, self.downloaded,
+                               self.total, self.speed)
+
+        if self.cancel_event.is_set():
+            raise DownloadCancelled()
+        if self.downloaded <= 0:
+            raise RuntimeError("скачанный файл пустой")
+        if self.total <= 0:
+            self.total = self.downloaded
+        os.replace(temp, target)
+
+    def _curl_remote_size(self, url: str) -> int:
+        """Узнаёт размер файла через curl (HEAD или Range-запрос)."""
+        curl = self._curl_path()
+        if not curl:
+            return 0
+        attempts = (
+            [curl, "-sS", "-L", "-r", "0-0", "-D", "-", "-o", os.devnull,
+             "--max-time", "30", "-A", self.USER_AGENT, url],
+            [curl, "-sSIL", "--max-time", "30", "-A", self.USER_AGENT, url],
+        )
+        for command in attempts:
+            try:
+                result = subprocess.run(
+                    command, capture_output=True, timeout=45,
+                    creationflags=popen_flags(),
+                )
+            except Exception:  # noqa: BLE001
+                continue
+            text = result.stdout.decode("latin-1", "replace")
+            types = re.findall(r"(?im)^content-type:\s*([^\r\n]+)", text)
+            if types and "text/html" in types[-1].lower():
+                continue
+            ranges = re.findall(
+                r"(?im)^content-range:\s*bytes\s+\d+-\d+/(\d+)", text
+            )
+            if ranges:
+                return int(ranges[-1])
+            sizes = re.findall(r"(?im)^content-length:\s*(\d+)", text)
+            if sizes:
+                return int(sizes[-1])
+        return 0
+
+    def _download_with_curl(self, url: str, temp: str, target: str) -> None:
+        """Скачивание системным curl с живым прогрессом по размеру файла."""
+        curl = self._curl_path()
+        if not curl:
+            raise RuntimeError("curl.exe не найден")
+        self.total = self._curl_remote_size(url)
+        self._emit(self.on_progress, 0, self.total, 0.0)
+
+        process = subprocess.Popen(
+            [
+                curl, "-sS", "-L", "--fail", "--retry", "2",
+                "--retry-delay", "2", "--connect-timeout", "30",
+                "-A", self.USER_AGENT, "-o", temp, url,
+            ],
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.PIPE,
+            creationflags=popen_flags(),
+        )
+        last_time = time.time()
+        last_bytes = 0
+        try:
+            while True:
+                if self.cancel_event.is_set():
+                    process.terminate()
+                    try:
+                        process.wait(timeout=5)
+                    except Exception:  # noqa: BLE001
+                        process.kill()
+                    raise DownloadCancelled()
+
+                size = os.path.getsize(temp) if os.path.exists(temp) else 0
+                self.downloaded = size
+                now = time.time()
+                if now - last_time >= 0.2:
+                    instant = (size - last_bytes) / max(now - last_time, 1e-6)
+                    self.speed = (
+                        instant if self.speed <= 0
+                        else self.speed * 0.6 + instant * 0.4
+                    )
+                    last_time = now
+                    last_bytes = size
+                    self._emit(self.on_progress, size, self.total, self.speed)
+
+                if process.poll() is not None:
+                    break
+                time.sleep(0.1)
+        except DownloadCancelled:
+            raise
+        except Exception:
+            process.terminate()
+            raise
+
+        error = b""
+        if process.stderr is not None:
+            try:
+                error = process.stderr.read() or b""
+            except Exception:  # noqa: BLE001
+                error = b""
+        if process.returncode != 0:
+            message = error.decode("utf-8", "replace").strip()
+            raise RuntimeError(
+                message or f"curl завершился с кодом {process.returncode}"
+            )
+
+        final_size = os.path.getsize(temp) if os.path.exists(temp) else 0
+        if final_size <= 0:
+            raise RuntimeError("скачанный файл пустой")
+        if self.total <= 0:
+            self.total = final_size
+        self.downloaded = final_size
+        os.replace(temp, target)
 
 
 class SplashScreen:
@@ -1135,40 +1729,56 @@ class KitagawaUtilitsApp(ctk.CTk):
         )
         sidebar.grid(row=0, column=0, sticky="ns", padx=(18, 0), pady=18)
         sidebar.grid_propagate(False)
+        sidebar.grid_columnconfigure(0, weight=1)
+        sidebar.grid_rowconfigure(0, weight=1)
+
+        # Прокручиваемая часть: заголовок, статус и кнопки вкладок.
+        # Если окно низкое, меню можно прокрутить колесиком мыши.
+        scroll = ctk.CTkScrollableFrame(
+            sidebar,
+            width=240,
+            fg_color="transparent",
+            corner_radius=0,
+            scrollbar_fg_color="transparent",
+            scrollbar_button_color=COLOR_CARD_HOVER,
+            scrollbar_button_hover_color=COLOR_ACCENT,
+        )
+        scroll.grid(row=0, column=0, sticky="nsew", padx=(0, 2))
+        self._sidebar_scroll = scroll
 
         ctk.CTkLabel(
-            sidebar,
+            scroll,
             text=APP_NAME,
             font=ui_font(size=21, weight="bold"),
             text_color=COLOR_TEXT,
-            wraplength=224,
+            wraplength=210,
             justify="left",
         ).pack(anchor="w", padx=20, pady=(20, 0))
 
         ctk.CTkLabel(
-            sidebar,
+            scroll,
             text=t("version_label"),
             font=ui_font(size=12, weight="bold"),
             text_color=COLOR_ACCENT,
         ).pack(anchor="w", padx=20, pady=(2, 2))
 
         ctk.CTkLabel(
-            sidebar,
+            scroll,
             text=t("app_subtitle"),
             font=ui_font(size=11),
             text_color=COLOR_MUTED,
-            wraplength=224,
+            wraplength=210,
             justify="left",
         ).pack(anchor="w", padx=20, pady=(4, 14))
 
         self.connection_badge = ctk.CTkLabel(
-            sidebar,
+            scroll,
             text=t("conn_waiting"),
             fg_color=COLOR_CARD_HOVER,
             text_color=COLOR_MUTED,
             corner_radius=10,
             height=34,
-            width=224,
+            width=210,
             font=ui_font(size=12, weight="bold"),
         )
         self.connection_badge.pack(fill="x", padx=14, pady=(0, 12))
@@ -1185,7 +1795,7 @@ class KitagawaUtilitsApp(ctk.CTk):
         ]
         for key, label in nav_items:
             button = ctk.CTkButton(
-                sidebar,
+                scroll,
                 text=label,
                 anchor="w",
                 height=44,
@@ -1199,11 +1809,15 @@ class KitagawaUtilitsApp(ctk.CTk):
             button.pack(fill="x", padx=12, pady=3)
             self.nav_buttons[key] = button
 
-        spacer = ctk.CTkFrame(sidebar, fg_color="transparent")
-        spacer.pack(fill="both", expand=True)
+        # Нижняя закреплённая часть: переключатель 5 языков всегда на виду.
+        footer = ctk.CTkFrame(sidebar, fg_color="transparent")
+        footer.grid(row=1, column=0, sticky="ew", padx=14, pady=(4, 12))
+        ctk.CTkFrame(footer, height=1, fg_color=COLOR_BORDER).pack(
+            fill="x", pady=(0, 8)
+        )
 
-        language_row = ctk.CTkFrame(sidebar, fg_color="transparent")
-        language_row.pack(fill="x", padx=14, pady=(0, 8))
+        language_row = ctk.CTkFrame(footer, fg_color="transparent")
+        language_row.pack(fill="x")
         ctk.CTkLabel(
             language_row,
             text="🌐",
@@ -1228,11 +1842,11 @@ class KitagawaUtilitsApp(ctk.CTk):
         self.language_menu.pack(side="left", fill="x", expand=True)
 
         ctk.CTkLabel(
-            sidebar,
+            footer,
             text=f"{APP_TITLE}  ·  Windows 10/11",
             font=ui_font(size=10),
             text_color="#6B6B72",
-        ).pack(anchor="w", padx=20, pady=(0, 18))
+        ).pack(anchor="w", padx=6, pady=(8, 0))
 
     def show_page(self, name: str) -> None:
         self._current_page = name
@@ -4822,10 +5436,14 @@ class KitagawaUtilitsApp(ctk.CTk):
         if url:
             self.log(f"URL: {url}", "cmd")
 
-        def on_status(kind: str) -> None:
+        def on_status(kind: str, detail: str = "") -> None:
             try:
                 if kind == "resolving":
                     status.configure(text=t("dl_resolving"), text_color=COLOR_MUTED)
+                elif kind == "resolved":
+                    status.configure(text=t("dl_direct_found"), text_color=COLOR_OK)
+                    if detail:
+                        self.log(f"Прямая ссылка: {detail}", "muted")
                 else:
                     status.configure(text=t("dl_connecting"), text_color=COLOR_MUTED)
             except Exception:  # noqa: BLE001

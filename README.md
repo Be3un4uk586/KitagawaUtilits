@@ -2,11 +2,11 @@
 
 <img src="app.ico" width="96" alt="Иконка KitagawaUtilits">
 
-# KitagawaUtilits v7.0
+# KitagawaUtilits v7.1
 
 **Простой и безопасный помощник для Android на Windows**
 
-[![Версия](https://img.shields.io/badge/%D0%B2%D0%B5%D1%80%D1%81%D0%B8%D1%8F-7.0-C94A4A?style=for-the-badge)](../../releases/latest)
+[![Версия](https://img.shields.io/badge/%D0%B2%D0%B5%D1%80%D1%81%D0%B8%D1%8F-7.1-C94A4A?style=for-the-badge)](../../releases/latest)
 [![Windows](https://img.shields.io/badge/Windows-10%20%7C%2011-0078D6?style=for-the-badge&logo=windows&logoColor=white)](#-системные-требования)
 [![Python](https://img.shields.io/badge/Python-3.10%2B-3776AB?style=for-the-badge&logo=python&logoColor=white)](#-запуск-из-исходников)
 [![Android](https://img.shields.io/badge/Android-7.0%2B-3DDC84?style=for-the-badge&logo=android&logoColor=white)](#-подготовка-телефона)
@@ -65,8 +65,13 @@
 - Скачивание идёт в фоновом потоке (`threading`) с потоковой записью на диск кусками по 64 КБ —
   оперативная память не переполняется даже на архивах объёмом 3–5 ГБ.
 - Кнопка **«Отмена»** останавливает загрузку и удаляет недокачанный файл.
-- Если в каталоге указана страница релиза, программа сама находит прямую ссылку на `.zip`
-  через GitHub API, а если это невозможно — аккуратно открывает страницу в браузере.
+- **Умный резолвер по коду устройства (`codename`):** программа сама находит прямой `.zip`
+  через официальное API **LineageOS**, RSS-зеркала **SourceForge** (crDroid, Evolution X,
+  PixelOS, RisingOS, Xiaomi.eu), **GitHub Releases** и OTA-JSON кастомных прошивок.
+- Браузер открывается **только если** ни один источник не отдал прямой файл
+  (например, закрытые сайты Vivo/OPPO/Samsung).
+- Если сервер вместо архива вернул HTML-страницу, загрузчик не сохранит её как прошивку,
+  а покажет понятную ошибку.
 - После завершения кнопка меняется на **«⚡ Перейти к установке»**: открывается вкладка
   установки, и путь к скачанному файлу подставляется автоматически.
 - Готовые архивы сохраняются в `Downloads\KitagawaFirmwares`.
