@@ -833,10 +833,13 @@ class FirmwareDownloader:
             ).lower()
         except Exception:  # noqa: BLE001
             path = (value or "").lower()
-        return any(
-            path.endswith(suffix) or f"{suffix}?" in path
-            for suffix in cls.EXCLUDED_NAMES
-        )
+        for suffix in cls.EXCLUDED_NAMES:
+            # .tar.md5 — это полноценная прошивка Samsung, а не контрольная сумма.
+            if suffix == ".md5" and path.endswith(".tar.md5"):
+                continue
+            if path.endswith(suffix) or f"{suffix}?" in path:
+                return True
+        return False
 
     def _find_archive_in_json(self, data, depth: int = 0) -> str | None:
         """Ищет первый .zip/.tgz в JSON любой структуры.
