@@ -1,9 +1,24 @@
 """
-KitagawaUtilits v7.1.
+KitagawaUtilits v7.2.
 
 Простой и безопасный помощник для Android на Windows.
 
-Что нового в версии 7.1:
+Что нового в версии 7.2:
+  * встроенный загрузчик прошивок доведён до идеала: файл качается прямо
+    в программе, без перекидывания в браузер;
+  * SourceForge (crDroid, Evolution X, PixelOS, RisingOS, DerpFest,
+    Project Elixir, Xiaomi.eu) разбирается через RSS и HTML-список файлов:
+    выбирается самый свежий .zip и качается с зеркала use_mirror=autoselect;
+  * Xiaomi / Redmi / POCO (HyperOS, MIUI, Xiaomi.eu): поиск прямой ссылки
+    на bigota/cdnorg.d.miui.com по codename через зеркала и трекеры;
+  * LineageOS, PixelExperience, ArrowOS, Paranoid Android — официальные
+    API/JSON сборок с автоматическим извлечением последнего билда;
+  * универсальный парсер страниц: .zip, .tgz, .tar.md5, .ozip, .ops, .bin;
+  * браузер открывается только при капче/авторизации с понятным пояснением;
+  * «💾 Быстрый бэкап»: фото, документы и список приложений через adb pull;
+  * автопроверка обновлений на GitHub и кнопка «🚀 Доступно обновление».
+
+Возможности версии 7.1:
   * умный резолвер прямых .zip-ссылок по коду устройства (codename):
     LineageOS API, SourceForge RSS (crDroid, Evolution X, PixelOS, RisingOS),
     GitHub Releases и OTA-JSON кастомных прошивок;
@@ -67,9 +82,14 @@ except Exception:  # noqa: BLE001
 # Константы
 # ---------------------------------------------------------------------------
 APP_NAME = "KitagawaUtilits"
-APP_VERSION = "7.1"
+APP_VERSION = "7.2"
 APP_SUBTITLE = "Простой и безопасный помощник для Android"
-APP_TITLE = "KitagawaUtilits v7.1"
+APP_TITLE = "KitagawaUtilits v7.2"
+
+# Репозиторий проекта: автопроверка обновлений и живой каталог прошивок.
+GITHUB_REPO = "Be3un4uk586/KitagawaUtilits"
+GITHUB_REPO_URL = f"https://github.com/{GITHUB_REPO}"
+GITHUB_RELEASE_API = f"https://api.github.com/repos/{GITHUB_REPO}/releases/latest"
 
 # Скрывает консольное окно Windows при запуске дочерних процессов.
 CREATE_NO_WINDOW = 0x08000000
@@ -343,6 +363,9 @@ FIRMWARE_DOWNLOAD_DIR = os.path.join(
     os.path.expanduser("~"), "Downloads", "KitagawaFirmwares"
 )
 
+# Быстрый бэкап: Backups\{Модель}_{Дата} в профиле пользователя.
+BACKUP_ROOT = os.path.join(os.path.expanduser("~"), "Backups")
+
 # Локальные данные программы: кэш каталога и scrcpy.
 LOCAL_DATA_DIR = os.path.join(
     os.environ.get("LOCALAPPDATA") or application_dir(), APP_NAME
@@ -353,7 +376,7 @@ SCRCPY_DIR = os.path.join(LOCAL_DATA_DIR, "scrcpy")
 # Живой каталог прошивок: кнопка «Обновить базу» скачивает свежий JSON
 # прямо из GitHub-репозитория, без пересборки .exe.
 REMOTE_CATALOG_URL = (
-    "https://raw.githubusercontent.com/Be3un4uk586/KitagawaUtilits/main/firmwares.json"
+    f"https://raw.githubusercontent.com/{GITHUB_REPO}/main/firmwares.json"
 )
 
 # GitHub API для загрузки последнего релиза scrcpy-win64.
@@ -547,14 +570,22 @@ class FirmwareDownloader:
     CHUNK_SIZE = 65536
     USER_AGENT = (
         "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
-        "(KHTML, like Gecko) Chrome/124.0 Safari/537.36 KitagawaUtilits/7.1"
+        "(KHTML, like Gecko) Chrome/124.0 Safari/537.36 KitagawaUtilits/7.2"
     )
     FILE_EXTENSIONS = (
-        ".zip", ".img", ".bin", ".tar", ".tar.gz", ".tgz",
-        ".7z", ".rar", ".xz", ".gz",
+        ".zip", ".img", ".bin", ".tar", ".tar.md5", ".tar.gz", ".tgz",
+        ".ozip", ".ops", ".7z", ".rar", ".xz", ".gz",
     )
-    # Для JSON/API-резолверов ищем именно архивы прошивки, а не boot.img.
-    ARCHIVE_EXTENSIONS = (".zip", ".tgz")
+    # Для JSON/API-резолверов ищем именно полные архивы прошивки.
+    ARCHIVE_EXTENSIONS = (
+        ".zip", ".tgz", ".tar.md5", ".tar.gz", ".ozip", ".ops",
+    )
+    # Файлы, которые не являются полной прошивкой и не должны качаться.
+    EXCLUDED_NAMES = (
+        "boot.img", "recovery.img", "init_boot.img", "vendor_boot.img",
+        "super_empty.img", "dtbo.img", "vbmeta.img", ".sha256", ".sha1",
+        ".md5", ".json", ".txt", ".xml", ".html",
+    )
 
     # GitHub: поддерживаем и страницу релиза, и корень репозитория.
     GITHUB_RE = re.compile(
@@ -563,18 +594,44 @@ class FirmwareDownloader:
         re.IGNORECASE,
     )
     HTML_LINK_RE = re.compile(
-        r"""(?:href|src|data-url)\s*=\s*["']([^"']+?\.(?:zip|img|bin|tar\.gz|tgz|7z|rar|xz))["']""",
+        r"""(?:href|src|data-url|data-href|data-download)\s*=\s*["']"""
+        r"""([^"']+?\.(?:zip|img|bin|tar\.md5|tar\.gz|tgz|ozip|ops|7z|rar|xz))["']""",
         re.IGNORECASE,
     )
     # Прямые ссылки на файл, спрятанные в JSON/HTML (в том числе с \/).
     ESCAPED_LINK_RE = re.compile(
-        r"https?:\\?/\\?/[^\"'<>\s]+?\.(?:zip|tgz)", re.IGNORECASE
+        r"https?:\\?/\\?/[^\"'<>\s]+?\.(?:zip|tgz|tar\.md5|ozip|ops|bin)",
+        re.IGNORECASE,
     )
     SOURCEFORGE_FILE_LINK_RE = re.compile(
-        r"https?://(?:www\.)?sourceforge\.net/projects/[^\"'<>\s]+?\.zip/download",
+        r"https?://(?:www\.)?sourceforge\.net/projects/[^\"'<>\s]+?"
+        r"\.(?:zip|tgz|tar\.md5|ozip|ops)/download",
         re.IGNORECASE,
     )
     SOURCEFORGE_ITEM_RE = re.compile(r"<item>(.*?)</item>", re.IGNORECASE | re.DOTALL)
+
+    # Официальные зеркала Xiaomi (HyperOS / MIUI / Xiaomi.eu).
+    XIAOMI_MIRROR_RE = re.compile(
+        r"https?://(?:"
+        r"(?:bigota|cdnorg|bn|hugeota|airbota)\.d\.miui\.com/"
+        r"|[a-z0-9.-]*miui-ota-update[a-z0-9.-]*\.aliyuncs\.com/"
+        r")[^\"'<>\s]+?\.(?:tgz|zip|tar\.md5)",
+        re.IGNORECASE,
+    )
+    XIAOMI_PAGE_TEMPLATES = (
+        "https://xiaomifirmwareupdater.com/hyperos/{codename}/",
+        "https://xiaomifirmwareupdater.com/miui/{codename}/",
+        "https://xiaomifirmwareupdater.com/archive/hyperos/{codename}/",
+        "https://xiaomifirmwareupdater.com/archive/miui/{codename}/",
+        "https://miuirom.org/phones/{codename}",
+    )
+    # Трекеры прошивок Xiaomi на GitHub (YAML/JSON с прямыми ссылками).
+    XIAOMI_TRACKER_URLS = (
+        "https://raw.githubusercontent.com/XiaomiFirmwareUpdater/"
+        "miui-updates-tracker/master/data/latest.yml",
+        "https://raw.githubusercontent.com/XiaomiFirmwareUpdater/"
+        "miui-updates-tracker/master/data/miui.yml",
+    )
 
     # Официальное API LineageOS (v2 — актуальное, v1 — запасное).
     LINEAGE_API_TEMPLATES = (
@@ -583,13 +640,29 @@ class FirmwareDownloader:
         "https://lineageos.org/api/v2/devices/{codename}/builds",
     )
 
+    # API/JSON других популярных прошивок (пробуем по очереди).
+    ROM_API_TEMPLATES = (
+        "https://download.pixelexperience.org/api/v1/{codename}",
+        "https://api.arrowos.net/v1/{codename}",
+        "https://paranoidandroid.co/api/v1/{codename}",
+        "https://download.pixelexperience.org/{codename}",
+    )
+
+    # Признаки капчи/авторизации — только тогда открываем браузер.
+    CAPTCHA_MARKERS = (
+        "captcha", "recaptcha", "hcaptcha", "cf-challenge",
+        "sign in to download", "login to download", "please log in",
+        "access denied", "authorization required",
+    )
+
     # Какие SourceForge-проекты соответствуют названию прошивки.
     SOURCEFORGE_OS_PROJECTS = {
         "crdroid": ("crdroid",),
-        "evolution x": ("evolution-x",),
+        "evolution x": ("evolution-x", "evolutionx"),
         "pixelos": ("pixelos", "pixelos-releases", "pixelos-aosp"),
         "risingos": ("risingos", "risingos-releases", "risingos-revived"),
-        "derpfest": ("derpfest",),
+        "derpfest": ("derpfest", "derp-fest"),
+        "project elixir": ("project-elixir", "elixir"),
         "xiaomi.eu": ("xiaomi-eu-multilang-miui-roms",),
     }
 
@@ -606,6 +679,22 @@ class FirmwareDownloader:
         "evolution x": (
             ("Evolution-X/OTA",),
             ("sixteen", "fifteen", "fourteen", "main"),
+        ),
+        "derpfest": (
+            ("DerpFest-Devices/OTA", "DerpFest-AOSP/ota"),
+            ("sixteen", "fifteen", "main"),
+        ),
+        "project elixir": (
+            ("Project-Elixir/ota",),
+            ("sixteen", "fifteen", "main"),
+        ),
+        "arrowos": (
+            ("ArrowOS/ota",),
+            ("thirteen", "twelve", "main"),
+        ),
+        "paranoid android": (
+            ("AOSPA/ota", "paranoidandroid/ota"),
+            ("sixteen", "fifteen", "main"),
         ),
     }
 
@@ -627,6 +716,7 @@ class FirmwareDownloader:
         self.total = 0
         self.speed = 0.0
         self.path = ""
+        self.fallback_reason = ""
 
     # ------------------------------------------------------------------
     # Управление потоком
@@ -700,13 +790,27 @@ class FirmwareDownloader:
         except (ValueError, UnicodeError):
             return None
 
+    def _fetch_text_fallback(self, url: str, accept: str | None = None,
+                             limit: int = 2 * 1024 * 1024,
+                             timeout: int = 25) -> str:
+        """Читает страницу urllib-ом, а при 403 — через curl и PowerShell."""
+        text = self._fetch_text(url, accept, limit, timeout)
+        if text.strip():
+            return text
+        text = self._curl_text(url, timeout=timeout)
+        if text.strip():
+            return text
+        return self._powershell_text(url, timeout=timeout + 10)
+
     @classmethod
     def _is_archive_url(cls, value) -> bool:
-        """True, если строка — прямая http(s)-ссылка на .zip/.tgz."""
+        """True, если строка — прямая http(s)-ссылка на архив прошивки."""
         if not isinstance(value, str):
             return False
         value = value.strip()
         if not value.lower().startswith(("http://", "https://")):
+            return False
+        if cls._is_excluded(value):
             return False
         try:
             path = urllib.parse.urlparse(value).path.lower()
@@ -715,7 +819,24 @@ class FirmwareDownloader:
         if path.endswith(cls.ARCHIVE_EXTENSIONS):
             return True
         # SourceForge: .../file.zip/download (ссылку потом превратим в зеркало).
-        return path.endswith("/download") and ".zip/" in path
+        if path.endswith("/download"):
+            inner = path[: -len("/download")]
+            return inner.endswith(cls.ARCHIVE_EXTENSIONS)
+        return False
+
+    @classmethod
+    def _is_excluded(cls, value: str) -> bool:
+        """Отсекает boot.img, recovery.img, контрольные суммы и JSON."""
+        try:
+            path = urllib.parse.unquote(
+                urllib.parse.urlparse(value).path
+            ).lower()
+        except Exception:  # noqa: BLE001
+            path = (value or "").lower()
+        return any(
+            path.endswith(suffix) or f"{suffix}?" in path
+            for suffix in cls.EXCLUDED_NAMES
+        )
 
     def _find_archive_in_json(self, data, depth: int = 0) -> str | None:
         """Ищет первый .zip/.tgz в JSON любой структуры.
@@ -760,9 +881,15 @@ class FirmwareDownloader:
         if not candidate:
             return None
         candidate = candidate.strip()
-        if ("sourceforge.net/projects/" in candidate
-                and ".zip/download" in candidate.lower()):
-            return self._sourceforge_direct(candidate)
+        lowered = candidate.lower()
+        if "sourceforge.net/projects/" in lowered and "/download" in lowered:
+            direct = self._sourceforge_direct(candidate)
+            if direct:
+                return direct
+            # SourceForge понимает use_mirror=autoselect и сам редиректит
+            # на ближайшее зеркало — файл качается напрямую в программе.
+            separator = "&" if "?" in candidate else "?"
+            return f"{candidate}{separator}use_mirror=autoselect"
         return candidate
 
     # ------------------------------------------------------------------
@@ -797,6 +924,24 @@ class FirmwareDownloader:
                         return self._normalize_direct(str(link).strip())
             # Запасной разбор JSON любой структуры.
             found = self._find_archive_in_json(data)
+            if found:
+                return self._normalize_direct(found)
+        # Если API недоступен — разбираем обычную страницу устройства.
+        page = self._fetch_text_fallback(
+            f"https://download.lineageos.org/devices/{safe}",
+            "text/html,application/xhtml+xml", timeout=25,
+        )
+        return self._find_archive_in_html(page, "https://download.lineageos.org")
+
+    def _resolve_rom_api(self, codename: str) -> str | None:
+        """PixelExperience / ArrowOS / Paranoid Android: API и JSON сборок."""
+        if not codename:
+            return None
+        safe = urllib.parse.quote(codename.strip(), safe="")
+        for template in self.ROM_API_TEMPLATES:
+            api = template.format(codename=safe)
+            data = self._fetch_json(api, timeout=15)
+            found = self._find_archive_in_json(data) if data else None
             if found:
                 return self._normalize_direct(found)
         return None
@@ -898,58 +1043,168 @@ class FirmwareDownloader:
 
     def _sourceforge_direct(self, download_url: str) -> str | None:
         """Достаёт из страницы SourceForge ссылку на зеркало с токеном."""
-        page = self._fetch_text(
+        page = self._fetch_text_fallback(
             download_url, "text/html,application/xhtml+xml",
             limit=1024 * 1024, timeout=25,
         )
-        direct = self._extract_sourceforge_direct(page)
-        if direct:
-            return direct
-
-        page = self._curl_text(download_url, timeout=25)
-        direct = self._extract_sourceforge_direct(page)
-        if direct:
-            return direct
-
-        page = self._powershell_text(download_url, timeout=35)
         return self._extract_sourceforge_direct(page)
 
-    def _resolve_sourceforge(self, project: str, codename: str) -> str | None:
-        """Ищет первый .zip в RSS SourceForge по codename (или по всему проекту)."""
-        paths = ["/"]
-        if codename:
-            paths.insert(0, "/" + codename.strip().strip("/"))
-        for path in paths:
-            rss = (
-                "https://sourceforge.net/projects/"
-                f"{urllib.parse.quote(project, safe='')}/rss?path="
-                f"{urllib.parse.quote(path, safe='/')}"
-            )
-            xml = self._fetch_text(
-                rss, "application/rss+xml, application/xml, text/xml", timeout=25
-            )
-            if not xml:
+    def _sourceforge_items(self, project: str, path: str) -> list[tuple[str, str]]:
+        """Возвращает [(title, link), ...] из RSS-ленты папки SourceForge."""
+        rss = (
+            "https://sourceforge.net/projects/"
+            f"{urllib.parse.quote(project, safe='')}/rss?path="
+            f"{urllib.parse.quote(path, safe='/')}"
+        )
+        xml = self._fetch_text_fallback(
+            rss, "application/rss+xml, application/xml, text/xml", timeout=25
+        )
+        if not xml:
+            return []
+        items: list[tuple[str, str]] = []
+        for block in self.SOURCEFORGE_ITEM_RE.findall(xml):
+            link = self._rss_value(block, "link")
+            title = self._rss_value(block, "title")
+            if not link:
                 continue
-            for block in self.SOURCEFORGE_ITEM_RE.findall(xml):
-                link = self._rss_value(block, "link")
-                title = self._rss_value(block, "title")
-                if not link:
-                    continue
-                link_path = urllib.parse.urlparse(link).path.lower()
-                if not (link_path.endswith(".zip/download")
-                        or link_path.endswith(".zip")):
-                    continue
+            link = html.unescape(link).strip()
+            if not self._is_archive_url(link) or self._is_excluded(link):
+                continue
+            items.append((title, link))
+        return items
+
+    def _sourceforge_files_page(self, project: str, codename: str) -> list[str]:
+        """Разбирает HTML-список файлов папки устройства на SourceForge."""
+        if not codename:
+            return []
+        safe_project = urllib.parse.quote(project, safe="")
+        safe_code = urllib.parse.quote(codename.strip().strip("/"), safe="")
+        page = self._fetch_text_fallback(
+            f"https://sourceforge.net/projects/{safe_project}/files/{safe_code}/",
+            "text/html,application/xhtml+xml", timeout=25,
+        )
+        if not page:
+            return []
+        pattern = re.compile(
+            rf"https?://(?:www\.)?sourceforge\.net/projects/"
+            rf"{re.escape(project)}/files/[^\"'<>\s]+?/download",
+            re.IGNORECASE,
+        )
+        links: list[str] = []
+        for link in pattern.findall(page):
+            link = html.unescape(link).strip()
+            if self._is_archive_url(link) and not self._is_excluded(link):
+                if link not in links:
+                    links.append(link)
+        return links
+
+    def _resolve_sourceforge(self, project: str, codename: str) -> str | None:
+        """Ищет самый свежий архив в RSS SourceForge по codename."""
+        paths: list[str] = []
+        if codename:
+            code = codename.strip().strip("/")
+            paths.extend([f"/{code}", f"/{code}/"])
+        paths.append("/")
+
+        candidates: list[str] = []
+        for path in paths:
+            items = self._sourceforge_items(project, path)
+            if not items:
+                continue
+            for title, link in items:
                 if path == "/" and codename:
                     haystack = f"{title} {link}".lower()
                     if codename.strip().lower() not in haystack:
                         continue
-                direct = self._sourceforge_direct(link)
-                if direct:
-                    return direct
-                # Если зеркало с токеном разобрать не удалось, отдаём саму
-                # ссылку .../file.zip/download — это тоже прямая .zip-ссылка.
-                return link
-        return None
+                if link not in candidates:
+                    candidates.append(link)
+            # RSS отдаёт файлы от новых к старым — первый и есть самый свежий.
+            if candidates:
+                break
+
+        if not candidates:
+            candidates = self._sourceforge_files_page(project, codename)
+
+        if not candidates:
+            return None
+        return self._normalize_direct(candidates[0])
+
+    # ------------------------------------------------------------------
+    # Xiaomi / Redmi / POCO (HyperOS, MIUI, Xiaomi.eu)
+    # ------------------------------------------------------------------
+    def _xiaomi_from_tracker(self, codename: str) -> list[str]:
+        """Разбирает YAML-трекер MiFirmware: codename, дата и прямая ссылка."""
+        code = codename.strip().lower()
+        if not code:
+            return []
+        for tracker in self.XIAOMI_TRACKER_URLS:
+            text = self._fetch_text_fallback(
+                tracker, "text/plain, application/x-yaml, */*", timeout=20,
+            )
+            if not text:
+                continue
+            entries: list[tuple[str, str]] = []
+            for block in re.split(r"(?m)^-\s+", text):
+                if f"codename: {code}" not in block.lower():
+                    continue
+                link_match = re.search(r"(?m)^\s*link:\s*(\S+)", block)
+                if not link_match:
+                    continue
+                link = link_match.group(1).strip("'\"")
+                if not self._is_archive_url(link) or self._is_excluded(link):
+                    continue
+                date_match = re.search(r"(?m)^\s*date:\s*(\S+)", block)
+                date = date_match.group(1).strip("'\"") if date_match else ""
+                entries.append((date, link))
+            if entries:
+                entries.sort(key=lambda item: item[0], reverse=True)
+                return [link for _date, link in entries]
+        return []
+
+    def _resolve_xiaomi(self, codename: str) -> str | None:
+        """Находит прямую ссылку на прошивку Xiaomi по codename устройства."""
+        if not codename:
+            return None
+        safe = urllib.parse.quote(codename.strip(), safe="")
+        candidates: list[str] = []
+
+        # 1) GitHub-трекер MiFirmware: выбираем самый свежий билд по дате.
+        candidates = self._xiaomi_from_tracker(codename)
+        if candidates:
+            return candidates[0]
+
+        # 2) Страницы зеркал xiaomifirmwareupdater.com / miuirom.org.
+        for template in self.XIAOMI_PAGE_TEMPLATES:
+            page_url = template.format(codename=safe)
+            page = self._fetch_text_fallback(
+                page_url, "text/html,application/xhtml+xml", timeout=20,
+            )
+            if not page:
+                continue
+            for link in self.XIAOMI_MIRROR_RE.findall(page):
+                link = html.unescape(link).strip()
+                if link not in candidates and not self._is_excluded(link):
+                    candidates.append(link)
+            if candidates:
+                break
+            # Запасной разбор любых ссылок на архивы внутри страницы.
+            for link in self.HTML_LINK_RE.findall(page):
+                link = link.strip()
+                if link.startswith("//"):
+                    link = "https:" + link
+                elif not link.lower().startswith(("http://", "https://")):
+                    link = urllib.parse.urljoin(page_url, link)
+                if (self._is_archive_url(link) and not self._is_excluded(link)
+                        and codename.strip().lower() in link.lower()
+                        and link not in candidates):
+                    candidates.append(link)
+            if candidates:
+                break
+
+        if not candidates:
+            return None
+        # На страницах Xiaomi новые сборки идут первыми.
+        return candidates[0]
 
     def _codename(self) -> str:
         """Codename устройства: из каталога, а если нет — из ссылки."""
@@ -1051,56 +1306,110 @@ class FirmwareDownloader:
     # ------------------------------------------------------------------
     # Разбор HTML как последний шанс
     # ------------------------------------------------------------------
-    def _resolve_html(self, url: str) -> str | None:
-        page = self._fetch_text(
-            url, "text/html,application/xhtml+xml",
-            limit=1024 * 1024, timeout=25,
-        )
+    def _page_needs_browser(self, page: str) -> bool:
+        """True, если страница защищена капчей или требует входа."""
+        lowered = (page or "").lower()
+        return any(marker in lowered for marker in self.CAPTCHA_MARKERS)
+
+    def _find_archive_in_html(self, page: str, base_url: str) -> str | None:
+        """Универсальный парсер: ищет на странице ссылку на архив прошивки."""
         if not page:
             return None
 
-        # 1) SourceForge-ссылки на .zip внутри страницы.
+        # 1) SourceForge-ссылки на файл внутри страницы.
         for link in self.SOURCEFORGE_FILE_LINK_RE.findall(page):
-            direct = self._sourceforge_direct(html.unescape(link))
+            link = html.unescape(link).strip()
+            if self._is_excluded(link):
+                continue
+            direct = self._sourceforge_direct(link)
             if direct:
                 return direct
+            separator = "&" if "?" in link else "?"
+            return f"{link}{separator}use_mirror=autoselect"
 
-        # 2) Прямые .zip/.img в href/src/data-url.
+        # 2) Прямые архивы в href/src/data-url (включая относительные пути).
         for candidate in self.HTML_LINK_RE.findall(page):
-            candidate = candidate.strip()
+            candidate = html.unescape(candidate).strip()
             if candidate.startswith("//"):
                 candidate = "https:" + candidate
             elif not candidate.lower().startswith(("http://", "https://")):
-                candidate = urllib.parse.urljoin(url, candidate)
-            if candidate.lower().endswith(self.FILE_EXTENSIONS):
-                return candidate
+                candidate = urllib.parse.urljoin(base_url, candidate)
+            if self._is_archive_url(candidate) and not self._is_excluded(candidate):
+                return self._normalize_direct(candidate)
 
         # 3) Ссылки, спрятанные в JSON/JS (в том числе с экранированием \/).
         for candidate in self.ESCAPED_LINK_RE.findall(page):
-            candidate = candidate.replace("\\/", "/").strip()
-            if candidate.lower().startswith(("http://", "https://")):
-                return candidate
+            candidate = html.unescape(candidate).replace("\\/", "/").strip()
+            if (self._is_archive_url(candidate)
+                    and not self._is_excluded(candidate)):
+                return self._normalize_direct(candidate)
+
+        # 4) Любые «голые» URL на странице (кнопки Download, CDN-ссылки).
+        for candidate in re.findall(r"https?://[^\"'<>\s]+", page):
+            candidate = html.unescape(candidate).rstrip(").,;")
+            if self._is_archive_url(candidate) and not self._is_excluded(candidate):
+                return self._normalize_direct(candidate)
         return None
+
+    def _resolve_html(self, url: str) -> str | None:
+        page = self._fetch_text_fallback(
+            url, "text/html,application/xhtml+xml",
+            limit=2 * 1024 * 1024, timeout=25,
+        )
+        if not page:
+            return None
+        if self._page_needs_browser(page):
+            self.fallback_reason = (
+                "сайт защищён капчей или требует входа в аккаунт"
+            )
+            return None
+        return self._find_archive_in_html(page, url)
 
     def resolve_url(self, url: str) -> str | None:
         """Возвращает прямую ссылку на архив или None, если её не найти.
 
-        Порядок: прямой файл -> GitHub -> LineageOS -> SourceForge по
-        названию прошивки -> OTA-JSON -> SourceForge из URL -> разбор HTML.
+        Порядок: прямой файл -> GitHub -> Xiaomi -> LineageOS -> другие
+        API -> SourceForge по названию прошивки -> SourceForge из URL ->
+        OTA-JSON -> универсальный разбор HTML.
         """
+        self.fallback_reason = ""
         if self.is_direct_url(url):
             return url
 
         codename = self._codename()
         os_name = str(self.firmware.get("os") or "").strip().lower()
-        haystack = f"{os_name} {url}".lower()
+        brand = str(self.firmware.get("brand") or "").strip().lower()
+        haystack = f"{os_name} {brand} {url}".lower()
 
         github = self._resolve_github(url)
         if github:
             return github
 
+        is_xiaomi = (
+            "xiaomi.eu" not in os_name
+            and "xiaomi-eu" not in haystack
+            and (
+                "hyperos" in os_name
+                or "miui" in os_name
+                or "xiaomifirmwareupdater" in haystack
+                or "miuirom.org" in haystack
+            )
+        )
+        if is_xiaomi:
+            found = self._resolve_xiaomi(codename)
+            if found:
+                return found
+
         if "lineage" in haystack:
             found = self._resolve_lineage(codename)
+            if found:
+                return found
+
+        if any(key in haystack for key in (
+            "pixelexperience", "pixel experience", "arrowos", "arrow os",
+            "paranoid", "aospa",
+        )):
+            found = self._resolve_rom_api(codename)
             if found:
                 return found
 
@@ -1111,15 +1420,15 @@ class FirmwareDownloader:
                     if found:
                         return found
 
+        found = self._sourceforge_from_url(url)
+        if found:
+            return found
+
         for key, (repos, branches) in self.OTA_JSON_SOURCES.items():
             if key in haystack:
                 found = self._resolve_ota_json(repos, branches, codename)
                 if found:
                     return found
-
-        found = self._sourceforge_from_url(url)
-        if found:
-            return found
 
         return self._resolve_html(url)
 
@@ -1128,7 +1437,9 @@ class FirmwareDownloader:
     # ------------------------------------------------------------------
     @staticmethod
     def _filename(url: str, firmware: dict) -> str:
-        path = urllib.parse.urlparse(url).path
+        path = urllib.parse.urlparse(url).path.rstrip("/")
+        if path.lower().endswith("/download"):
+            path = path[: -len("/download")]
         name = os.path.basename(urllib.parse.unquote(path))
         if not name or "." not in name:
             name = f"{firmware.get('id', 'firmware')}.zip"
@@ -1175,7 +1486,10 @@ class FirmwareDownloader:
             return
 
         if not direct:
-            self._emit(self.on_fallback, url)
+            reason = self.fallback_reason or (
+                "ни один источник не отдал прямую ссылку на файл"
+            )
+            self._emit(self.on_fallback, url, reason)
             return
 
         self._emit(self.on_status, "resolved", direct)
@@ -1585,6 +1899,14 @@ class KitagawaUtilitsApp(ctk.CTk):
         self.nav_buttons: dict[str, ctk.CTkButton] = {}
         self._current_page = "catalog"
 
+        # Автопроверка обновлений на GitHub.
+        self._update_info: dict | None = None
+        self._update_button: ctk.CTkButton | None = None
+        # Быстрый бэкап.
+        self._backup_button: ctk.CTkButton | None = None
+        self._backup_progress: ctk.CTkProgressBar | None = None
+        self._backup_status: ctk.CTkLabel | None = None
+
         self._build_ui()
         self._configure_log_tags()
 
@@ -1592,6 +1914,7 @@ class KitagawaUtilitsApp(ctk.CTk):
         self.show_page("catalog")
         self._initial_logs()
         self._start_connection_watch()
+        self.after(1500, self._check_updates_async)
 
         # Заставка запускается после сборки интерфейса и сама откроет окно.
         try:
@@ -1608,6 +1931,64 @@ class KitagawaUtilitsApp(ctk.CTk):
         try:
             self.focus_force()
         except tk.TclError:
+            pass
+
+    # ------------------------------------------------------------------
+    # Автопроверка обновлений с GitHub
+    # ------------------------------------------------------------------
+    @staticmethod
+    def _version_tuple(value: str) -> tuple[int, ...]:
+        numbers = re.findall(r"\d+", (value or "").lstrip("vV"))
+        return tuple(int(item) for item in numbers) or (0,)
+
+    def _check_updates_async(self) -> None:
+        threading.Thread(target=self._check_updates_worker, daemon=True).start()
+
+    def _check_updates_worker(self) -> None:
+        try:
+            request = urllib.request.Request(
+                GITHUB_RELEASE_API,
+                headers={
+                    "User-Agent": f"{APP_NAME}/{APP_VERSION}",
+                    "Accept": "application/vnd.github+json",
+                },
+            )
+            with urllib.request.urlopen(request, timeout=12) as response:
+                data = json.loads(response.read(512 * 1024).decode("utf-8", "replace"))
+        except Exception:  # noqa: BLE001
+            return
+        if not isinstance(data, dict):
+            return
+        tag = str(data.get("tag_name") or "").strip()
+        url = str(data.get("html_url") or "").strip()
+        if not tag or not url:
+            return
+        if self._version_tuple(tag) <= self._version_tuple(APP_VERSION):
+            return
+        self._update_info = {"tag": tag, "url": url}
+        self.after(0, self._show_update_button)
+
+    def _show_update_button(self) -> None:
+        if not self._update_info:
+            return
+        try:
+            if self._update_button is not None:
+                self._update_button.pack(fill="x", padx=12, pady=(14, 4))
+                self._update_button.lift()
+        except Exception:  # noqa: BLE001
+            pass
+        self.log(
+            f"Доступно обновление {self._update_info['tag']} — "
+            "кнопка «🚀 Доступно обновление» в левом меню.",
+            "ok",
+        )
+
+    def _open_update(self) -> None:
+        if not self._update_info:
+            return
+        try:
+            webbrowser.open(self._update_info["url"])
+        except Exception:  # noqa: BLE001
             pass
 
     # ------------------------------------------------------------------
@@ -1809,6 +2190,24 @@ class KitagawaUtilitsApp(ctk.CTk):
             button.pack(fill="x", padx=12, pady=3)
             self.nav_buttons[key] = button
 
+        # Коралловая кнопка обновления: появляется, если на GitHub есть
+        # релиз новее текущей версии.
+        self._update_button = ctk.CTkButton(
+            scroll,
+            text="🚀 Доступно обновление",
+            anchor="w",
+            height=42,
+            corner_radius=10,
+            fg_color=COLOR_ACCENT,
+            hover_color=COLOR_ACCENT_HOVER,
+            text_color=COLOR_TEXT,
+            font=ui_font(size=13, weight="bold"),
+            command=self._open_update,
+        )
+        self._update_button.pack(fill="x", padx=12, pady=(14, 4))
+        if not self._update_info:
+            self._update_button.pack_forget()
+
         # Нижняя закреплённая часть: переключатель 5 языков всегда на виду.
         footer = ctk.CTkFrame(sidebar, fg_color="transparent")
         footer.grid(row=1, column=0, sticky="ew", padx=14, pady=(4, 12))
@@ -1880,6 +2279,10 @@ class KitagawaUtilitsApp(ctk.CTk):
         self._action_widgets = []
         self._log_collapsed = False
         self._last_connection_state = None
+        self._update_button = None
+        self._backup_button = None
+        self._backup_progress = None
+        self._backup_status = None
         self._build_ui()
         self._configure_log_tags()
         self.show_page(current)
@@ -4047,6 +4450,70 @@ class KitagawaUtilitsApp(ctk.CTk):
             justify="left",
         ).grid(row=3, column=0, columnspan=2, sticky="w", padx=18, pady=(10, 16))
 
+        # --- Быстрый бэкап перед прошивкой/очисткой ---
+        backup_card = ctk.CTkFrame(
+            page,
+            fg_color=COLOR_CARD,
+            corner_radius=14,
+            border_width=1,
+            border_color=COLOR_BORDER,
+        )
+        backup_card.grid(row=4, column=0, sticky="ew", pady=(10, 0))
+        backup_card.grid_columnconfigure(0, weight=1)
+
+        ctk.CTkLabel(
+            backup_card,
+            text="Резервная копия перед прошивкой",
+            font=ui_font(size=15, weight="bold"),
+            text_color=COLOR_TEXT,
+        ).grid(row=0, column=0, sticky="w", padx=18, pady=(16, 4))
+
+        ctk.CTkLabel(
+            backup_card,
+            text=("Сохраняет фото и видео (DCIM), документы и список установленных "
+                  "приложений на компьютер. Делайте бэкап до прошивки или очистки — "
+                  "так данные точно не потеряются."),
+            font=ui_font(size=11),
+            text_color=COLOR_MUTED,
+            wraplength=820,
+            justify="left",
+        ).grid(row=1, column=0, sticky="w", padx=18, pady=(0, 10))
+
+        self._backup_button = ctk.CTkButton(
+            backup_card,
+            text="💾 Быстрый бэкап (Фото и список приложений)",
+            width=420,
+            height=44,
+            corner_radius=10,
+            fg_color=COLOR_ACCENT,
+            hover_color=COLOR_ACCENT_HOVER,
+            font=ui_font(size=13, weight="bold"),
+            command=self.quick_backup,
+        )
+        self._backup_button.grid(row=2, column=0, sticky="w", padx=18, pady=(0, 10))
+        self._action_widgets.append(self._backup_button)
+
+        self._backup_progress = ctk.CTkProgressBar(
+            backup_card,
+            height=8,
+            corner_radius=4,
+            progress_color=COLOR_ACCENT,
+            fg_color="#2A2D35",
+        )
+        self._backup_progress.grid(row=3, column=0, sticky="ew", padx=18)
+        self._backup_progress.set(0)
+
+        self._backup_status = ctk.CTkLabel(
+            backup_card,
+            text="Готово к созданию резервной копии.",
+            font=ui_font(size=11),
+            text_color=COLOR_MUTED,
+            anchor="w",
+            wraplength=820,
+            justify="left",
+        )
+        self._backup_status.grid(row=4, column=0, sticky="w", padx=18, pady=(6, 16))
+
         return page
 
     # ------------------------------ Здоровье и железо ------------------------------
@@ -5492,22 +5959,37 @@ class KitagawaUtilitsApp(ctk.CTk):
             self.log(f"Прошивка скачана: {path}", "ok")
             self.log(t("dl_saved_hint"), "muted")
 
-        def on_fallback(page_url: str) -> None:
+        def on_fallback(page_url: str, reason: str = "") -> None:
             state["downloader"] = None
+            reason_text = reason or "сайт не отдал прямую ссылку на файл"
             try:
                 progress.stop()
                 progress.configure(mode="determinate")
                 progress.set(0)
                 cancel_button.grid_remove()
                 button.configure(state="normal", text=t("dl_download"))
-                status.configure(text=t("dl_fallback"), text_color=COLOR_WARN)
+                status.configure(
+                    text=f"Браузер: {reason_text}", text_color=COLOR_WARN
+                )
             except Exception:  # noqa: BLE001
                 pass
             self.log(t("dl_fallback"), "warn")
+            self.log(f"Причина: {reason_text}.", "warn")
             if page_url:
                 self.log(f"Страница загрузки: {page_url}", "muted")
                 try:
                     webbrowser.open(page_url)
+                except Exception:  # noqa: BLE001
+                    pass
+                try:
+                    messagebox.showwarning(
+                        "Открываю браузер",
+                        "Прямую ссылку на файл получить не удалось.\n\n"
+                        f"Причина: {reason_text}.\n\n"
+                        "Страница загрузки открыта в браузере — скачайте файл там, "
+                        "а затем выберите его во вкладке «Установка прошивки».",
+                        parent=self,
+                    )
                 except Exception:  # noqa: BLE001
                     pass
 
@@ -5673,6 +6155,139 @@ class KitagawaUtilitsApp(ctk.CTk):
                 self.log(f"Установка завершилась с ошибкой (код {code}).", "error")
 
         self._run_task(worker)
+
+    # ------------------------------------------------------------------
+    # Быстрый бэкап: фото, документы и список приложений
+    # ------------------------------------------------------------------
+    @staticmethod
+    def _safe_folder_name(value: str) -> str:
+        name = re.sub(r'[<>:"/\\|?*]', "_", (value or "").strip())
+        name = re.sub(r"\s+", "_", name).strip("._")
+        return name or "device"
+
+    def _set_backup_progress(self, value: float, text: str,
+                             color: str = COLOR_MUTED) -> None:
+        def apply() -> None:
+            try:
+                if self._backup_progress is not None:
+                    self._backup_progress.set(max(0.0, min(1.0, value)))
+                if self._backup_status is not None:
+                    self._backup_status.configure(text=text, text_color=color)
+            except Exception:  # noqa: BLE001
+                pass
+
+        try:
+            self.after(0, apply)
+        except Exception:  # noqa: BLE001
+            pass
+
+    def quick_backup(self) -> None:
+        """Кнопка «💾 Быстрый бэкап (Фото и список приложений)»."""
+        if self._busy > 0:
+            self.log("Дождитесь завершения текущей операции.", "warn")
+            return
+        self._set_backup_progress(0.0, "Проверяю подключение телефона...")
+        self._run_task(self._quick_backup_worker)
+
+    def _quick_backup_worker(self) -> None:
+        self.log("=== Быстрый бэкап: фото и список приложений ===", "section")
+        code, model_out = self._capture(
+            [ADB, "shell", "getprop", "ro.product.model"], timeout=15.0
+        )
+        model = model_out.strip().splitlines()[-1].strip() if model_out.strip() else ""
+        if code != 0 or not model:
+            self._set_backup_progress(
+                0.0, "Телефон не найден — включите отладку по USB.", COLOR_ERR
+            )
+            self.log(
+                "Бэкап не начат: телефон не найден или отладка по USB выключена.",
+                "error",
+            )
+            return
+
+        _, code_out = self._capture(
+            [ADB, "shell", "getprop", "ro.product.device"], timeout=15.0
+        )
+        codename = code_out.strip().splitlines()[-1].strip() if code_out.strip() else ""
+        date = time.strftime("%Y-%m-%d_%H-%M")
+        folder = os.path.join(
+            BACKUP_ROOT, f"{self._safe_folder_name(model)}_{date}"
+        )
+        try:
+            os.makedirs(folder, exist_ok=True)
+        except OSError as exc:
+            self._set_backup_progress(0.0, f"Не удалось создать папку: {exc}", COLOR_ERR)
+            self.log(f"Не удалось создать папку бэкапа: {exc}", "error")
+            return
+
+        self.log(f"Папка бэкапа: {folder}", "info")
+        self.log(f"Модель: {model} ({codename or '—'})", "ok")
+
+        steps = (
+            ("фото и видео (DCIM)", "/sdcard/DCIM", "DCIM"),
+            ("документы", "/sdcard/Documents", "Documents"),
+        )
+        total = len(steps) + 1
+        done = 0
+        for label, remote, sub in steps:
+            self._set_backup_progress(
+                0.1 + 0.6 * done / total, f"Копирую {label}..."
+            )
+            code, output = self._capture(
+                [ADB, "pull", remote, os.path.join(folder, sub)], timeout=3600.0
+            )
+            if code == 0:
+                self.log(f"{label.capitalize()}: сохранено.", "ok")
+            else:
+                self.log(
+                    f"{label.capitalize()}: папка пуста или недоступна "
+                    f"({output.strip()[:160]}).",
+                    "warn",
+                )
+            done += 1
+
+        self._set_backup_progress(0.75, "Сохраняю список приложений...")
+        code, packages = self._capture(
+            [ADB, "shell", "pm", "list", "packages", "-f"], timeout=120.0
+        )
+        if code != 0:
+            code, packages = self._capture(
+                [ADB, "shell", "pm", "list", "packages"], timeout=120.0
+            )
+        packages_path = os.path.join(folder, "packages.txt")
+        try:
+            with open(packages_path, "w", encoding="utf-8") as handle:
+                handle.write(f"# {model} ({codename}) — {date}\n")
+                handle.write(packages or "")
+                handle.write("\n")
+        except OSError as exc:
+            self.log(f"Не удалось сохранить список приложений: {exc}", "error")
+        else:
+            count = len([line for line in packages.splitlines() if line.strip()])
+            self.log(
+                f"Список приложений: {count} пакетов -> {packages_path}", "ok"
+            )
+
+        try:
+            with open(os.path.join(folder, "info.txt"), "w", encoding="utf-8") as handle:
+                handle.write(
+                    f"Модель: {model}\nКод устройства: {codename}\nДата: {date}\n"
+                )
+        except OSError:
+            pass
+
+        self._set_backup_progress(1.0, f"Бэкап готов: {folder}", COLOR_OK)
+        self.log(f"Бэкап завершён: {folder}", "ok")
+        self.after(
+            0,
+            lambda: messagebox.showinfo(
+                "Бэкап готов",
+                f"Резервная копия сохранена:\n{folder}\n\n"
+                "Внутри: папки DCIM и Documents (если были на телефоне) "
+                "и список приложений packages.txt.",
+                parent=self,
+            ),
+        )
 
     # ------------------------------------------------------------------
     # Перезагрузка

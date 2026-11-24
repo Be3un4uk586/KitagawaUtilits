@@ -2,7 +2,7 @@
   "ru": {
     "_name": "Русский",
     "app_subtitle": "Простой и безопасный помощник для Android",
-    "version_label": "Версия 7.1",
+    "version_label": "Версия 7.2",
     "dl_download": "📥 Скачать в программу",
     "dl_downloading": "Загрузка...",
     "dl_cancel": "Отмена",
@@ -97,7 +97,7 @@
   "en": {
     "_name": "English",
     "app_subtitle": "A simple and safe assistant for Android",
-    "version_label": "Version 7.1",
+    "version_label": "Version 7.2",
     "dl_download": "📥 Download to app",
     "dl_downloading": "Downloading...",
     "dl_cancel": "Cancel",
@@ -305,7 +305,7 @@
   "uk": {
     "_name": "Українська",
     "app_subtitle": "Простий і безпечний помічник для Android",
-    "version_label": "Версія 7.1",
+    "version_label": "Версія 7.2",
     "dl_download": "📥 Завантажити в програму",
     "dl_downloading": "Завантаження...",
     "dl_cancel": "Скасувати",
@@ -513,7 +513,7 @@
   "es": {
     "_name": "Español",
     "app_subtitle": "Un asistente simple y seguro para Android",
-    "version_label": "Versión 7.1",
+    "version_label": "Versión 7.2",
     "dl_download": "📥 Descargar al programa",
     "dl_downloading": "Descargando...",
     "dl_cancel": "Cancelar",
@@ -721,7 +721,7 @@
   "zh": {
     "_name": "中文",
     "app_subtitle": "简单安全的 Android 助手",
-    "version_label": "版本 7.1",
+    "version_label": "版本 7.2",
     "dl_download": "📥 下载到程序",
     "dl_downloading": "正在下载...",
     "dl_cancel": "取消",
